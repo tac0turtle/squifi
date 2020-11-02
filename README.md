@@ -9,7 +9,7 @@ Solana Wormhole Hackathon
 - Pool voting:
   - If the pool has voting enabled, when the requester would like money out there will need to a be a vote by the pool share holders.
 - Pool Payback
-    - If the pool has payback enabled a nft should be minted for the contract between two parties.
+  - If the pool has payback enabled a nft should be minted for the contract between two parties.
 
 ## Features
 
