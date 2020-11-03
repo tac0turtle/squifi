@@ -14,11 +14,13 @@ pub enum FundError {
     #[error("InvalidState")]
     InvalidState,
 }
+
 impl From<FundError> for ProgramError {
     fn from(e: FundError) -> Self {
         ProgramError::Custom(e as u32)
     }
 }
+
 impl<T> DecodeError<T> for FundError {
     fn type_of() -> &'static str {
         "FundError"
