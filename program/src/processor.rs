@@ -5,7 +5,7 @@ use crate::{
   instruction::{FundInstruction, InitArgs},
   state::{Fund, State},
 };
-// use num_traits::FromPrimitive;
+
 use solana_program::{
   account_info::next_account_info, account_info::AccountInfo, entrypoint::ProgramResult, info,
   pubkey::Pubkey,
@@ -15,7 +15,7 @@ pub struct Processor {}
 
 impl Processor {
   pub fn process_initialize(
-    program_id: &Pubkey,
+    _program_id: &Pubkey,
     init: InitArgs,
     accounts: &[AccountInfo],
   ) -> ProgramResult {
