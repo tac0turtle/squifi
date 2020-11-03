@@ -40,7 +40,6 @@ impl State {
   /// Length of state data when serialized
   pub const LEN: usize = size_of::<u8>() + size_of::<Fund>();
   /// Deserializes a byte buffer into a [State](struct.State.html).
-  /// TODO efficient unpacking here
   pub fn deserialize(input: &[u8]) -> Result<State, ProgramError> {
     if input.len() < size_of::<u8>() {
       return Err(ProgramError::InvalidAccountData);
@@ -74,7 +73,7 @@ impl State {
     Ok(())
   }
   /// Gets the `Fund` from `State`
-  pub fn stake_pool(&self) -> Result<Fund, ProgramError> {
+  pub fn fund(&self) -> Result<Fund, ProgramError> {
     if let State::Init(swap) = &self {
       Ok(*swap)
     } else {

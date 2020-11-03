@@ -13,7 +13,7 @@ Solana Wormhole Hackathon
 
 ## Features
 
-- [ ] Create funding pool
+- [x] Create funding pool
 - [ ] Add tokens to Funding pool
 - [ ] Owner of pool withdraw tokens
 - [ ] Add pool contributor paybacks
