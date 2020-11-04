@@ -2,29 +2,31 @@
 
 use crate::error::FundError;
 use crate::instruction::unpack;
-use solana_program::{entrypoint::ProgramResult, program_error::ProgramError, pubkey::Pubkey};
+use solana_program::{
+  entrypoint::ProgramResult, program_error::ProgramError, program_pack::Pack, pubkey::Pubkey,
+};
 use std::mem::size_of;
 
 /// Initialized program details.
+/// Fund is a program account. 
+/// The Owner of the fund has the right to withdraw all or some of the funds
 #[repr(C)]
 #[derive(Clone, Copy, Debug, Default, PartialEq)]
 pub struct Fund {
-  /// Owner authority
-  /// allows for updating the Fund authority
+  /// Fund Owner
+  /// allows for updating the Fund owner
   pub owner: Pubkey,
-  // Pool Mint
-  pub pool_mint: Pubkey,
-  // Pool token program id
-  pub token_program_id: Pubkey,
-  // total under management
-  pub raised_total: u64,
-  // total pool
-  pub fund_total: u64,
-  // max size of the fund
-  pub max: u64,
+  /// Mint
+  pub mint: Pubkey,
+  /// Fund 
+  pub fund: Pubkey,
+  /// max size of the fund
+  pub max: u8,
+  /// Nounce of the program account
+  pub nounce: u8,
 }
 
-impl Fund {}
+/// impl Pack for Fund {} //todo
 
 /// Program states.
 #[repr(C)]

@@ -10,21 +10,25 @@ use std::mem::size_of;
 #[repr(C)]
 #[derive(Clone, Copy, Debug, Default, PartialEq)]
 pub struct InitArgs {
-  // Max Size of a fund
-  pub max: u64,
+  /// Owner of the Fund
+  pub owner: Pubkey, // Optional in the future for when gov spending is implemented?
+  /// Noune of the program account
+  pub nounce: u8,
+  /// Max Size of a fund
+  pub max: u8,
 }
 
 /// Instructions supported by the Fund program.
 #[repr(C)]
 #[derive(Clone, Debug, PartialEq)]
 pub enum FundInstruction {
-  // Initializes a new Fund.
-  //
-  // Fund to create
-  // Owner
-  // Fund token
-  // Token program ID
-  // InitArgs
+  /// Initializes a new Fund.
+  ///
+  /// Fund to create
+  /// Owner
+  /// Fund token
+  /// Token program ID
+  /// InitArgs
   Initialize(InitArgs),
 }
 
@@ -68,21 +72,15 @@ pub fn unpack<T>(input: &[u8]) -> Result<&T, ProgramError> {
 
 pub fn initialize(
   program_id: &Pubkey,
+  mint: &Pubkey,
   fund: &Pubkey,
-  owner: &Pubkey,
-  fund_mint: &Pubkey,
-  owner_pool_account: &Pubkey,
-  token_program_id: &Pubkey,
   init_args: InitArgs,
 ) -> Result<Instruction, ProgramError> {
   let init_data = FundInstruction::Initialize(init_args);
   let data = init_data.serialize()?;
   let accounts = vec![
     AccountMeta::new(*fund, true),
-    AccountMeta::new_readonly(*owner, false),
-    AccountMeta::new_readonly(*fund_mint, false),
-    AccountMeta::new_readonly(*owner_pool_account, false),
-    AccountMeta::new_readonly(*token_program_id, false),
+    AccountMeta::new_readonly(*mint, false),
   ];
   Ok(Instruction {
     program_id: *program_id,
