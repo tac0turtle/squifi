@@ -32,7 +32,7 @@ impl Processor {
       mint: *mint.key,
       fund: *fund.key,
       max: init.max,
-      nounce: init.nounce,
+      nounce: 0,
     });
     init_fund.serialize(&mut fund.data.borrow_mut())
   }
