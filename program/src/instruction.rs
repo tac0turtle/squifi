@@ -12,8 +12,6 @@ use std::mem::size_of;
 pub struct InitArgs {
   /// Owner of the Fund
   pub owner: Pubkey, // Optional in the future for when gov spending is implemented?
-  /// Noune of the program account
-  pub nounce: u8,
   /// Max Size of a fund
   pub max: u8,
 }
