@@ -7,3 +7,5 @@ pub mod state;
 pub mod entrypoint;
 
 pub use solana_program;
+
+solana_program::declare_id!("SPQQL11111111111111111111111111111111111111");

@@ -1,0 +1,15 @@
+[package]
+name = "spool"
+version = "0.1.0"
+authors = ["Callum Michael Waters <cmwaters19@gmail.com>", "Marko Baricevic <marbar3778@yahoo.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+clap = "2.33.3"
+solana-clap-utils = "1.4.5"
+solana-client = "1.4.5"
+solana-cli-config = "1.4.5"
+solana-sdk = "1.4.5"
+fund = { path="../program", features = [ "exclude_entrypoint" ] }
