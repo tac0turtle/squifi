@@ -26,6 +26,22 @@ pub mod instruction {
       /// fund type
       fund_type: FundType,
     },
+    /// Deposit sends tokens to a fund.
+    ///
+    /// [writable] Prgram account
+    /// [writable] Depositor
+    /// [signer] Depositor authority
+    /// [] Fund
+    /// [] SPL token program
+    Deposit { amount: u32 },
+    /// Withdraw funds from program account.
+    ///
+    /// [writable] fund owner
+    /// [writable] fund to withrdraw from
+    /// [writable] program accounr
+    /// [] fund authority
+    /// [] SPL token program
+    Withdraw { amount: u32 },
   }
 }
 

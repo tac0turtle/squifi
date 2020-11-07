@@ -10,7 +10,9 @@ use solana_program::{
 };
 
 pub(crate) mod access_control;
+mod despoist;
 mod initialize;
+mod withdraw;
 
 entrypoint!(process_instruction);
 fn process_instruction<'a>(
@@ -29,6 +31,10 @@ fn process_instruction<'a>(
       max_balance,
       fund_type,
     } => initialize::initialize(program_id, accounts, owner, max_balance, fund_type),
+    FundInstruction::Despoist { despoist_amount } => {
+      deposit::deposit(program_id, accounts, despoist_amount)
+    }
+    FundInstruction::Withdraw { amount } => deposit::deposit(program_id, accounts, amount),
   };
 
   result?;

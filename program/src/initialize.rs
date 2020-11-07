@@ -1,5 +1,3 @@
-//! Program state processor
-
 use crate::access_control::token;
 use fund::{
   error::{FundError, FundErrorCode},
@@ -15,8 +13,8 @@ use solana_sdk::{
 };
 
 pub fn initialize(
-  program_id: &Pubkey,
-  accounts: &[AccountInfo],
+  program_id: &'a Pubkey,
+  accounts: &'a [AccountInfo],
   owner: Pubkey,
   max_balance: u32,
   fund_type: FundType,
