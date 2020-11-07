@@ -1,10 +1,6 @@
-//! State transition types
-
 use serde::{Deserialize, Serialize};
 use serum_common::pack::*;
-use solana_program::{program_error::ProgramError, program_pack::Pack, pubkey::Pubkey};
-// use solana_client_gen::solana_sdk::pubkey::Pubkey;
-use std::mem::size_of;
+use solana_client_gen::solana_sdk::pubkey::Pubkey;
 
 #[derive(Debug, Clone, Copy, serde::Serialize, serde::Deserialize)]
 pub enum FundType {
@@ -16,7 +12,7 @@ pub enum FundType {
 /// Initialized program details.
 /// Fund is a program account.
 /// The Owner of the fund has the right to withdraw all or some of the funds
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Fund {
   /// type of fund
   pub fund_type: FundType,
@@ -32,7 +28,7 @@ pub struct Fund {
 
 serum_common::packable!(Fund);
 
-#[derive(Default, Debug, serde::Serialize, serde::Deserialize)]
+#[derive(Default, Debug, Serialize, Deserialize)]
 pub struct Account {
   /// Mint
   pub mint: Pubkey,
