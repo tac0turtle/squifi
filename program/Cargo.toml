@@ -20,7 +20,7 @@ default = []
 [dependencies]
 solana-program = "1.4.4"
 solana-sdk = { version = "1.4.5", default-features = false }
-spl-token = { version = "2.0.8", default-features = false }
+spl-token = "2.0.8"
 arrayref = "0.3.6"
 num-derive = "0.3"
 num-traits = "0.2"
