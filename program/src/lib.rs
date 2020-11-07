@@ -5,18 +5,17 @@ use fund::{
   instruction::FundInstruction,
 };
 use serum_common::pack::Pack;
-use solana_program::{
-  account_info::AccountInfo, entrypoint, entrypoint::ProgramResult, info, pubkey::Pubkey,
-};
+use solana_program::entrypoint;
+use solana_sdk::{account_info::AccountInfo, entrypoint::ProgramResult, info, pubkey::Pubkey};
 
 pub(crate) mod access_control;
-mod despoist;
+mod deposit;
 mod initialize;
 mod withdraw;
 
 entrypoint!(process_instruction);
 fn process_instruction<'a>(
-  program_id: &Pubkey,
+  program_id: &'a Pubkey,
   accounts: &'a [AccountInfo<'a>],
   instruction_data: &[u8],
 ) -> ProgramResult {
@@ -31,9 +30,7 @@ fn process_instruction<'a>(
       max_balance,
       fund_type,
     } => initialize::initialize(program_id, accounts, owner, max_balance, fund_type),
-    FundInstruction::Despoist { despoist_amount } => {
-      deposit::deposit(program_id, accounts, despoist_amount)
-    }
+    FundInstruction::Deposit { amount } => deposit::deposit(program_id, accounts, amount),
     FundInstruction::Withdraw { amount } => deposit::deposit(program_id, accounts, amount),
   };
 

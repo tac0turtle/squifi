@@ -14,6 +14,8 @@ pub enum FundType {
 /// The Owner of the fund has the right to withdraw all or some of the funds
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Fund {
+  /// open defines if deposits are still allowed or if the fund is empty.
+  pub open: bool,
   /// type of fund
   pub fund_type: FundType,
   /// fund Owner
@@ -24,6 +26,24 @@ pub struct Fund {
   pub max_balance: u32,
   /// balance of the
   pub balance: u32,
+}
+
+impl Fund {
+  pub fn deduct(&mut self, amount: u32) {
+    self.balance -= amount;
+  }
+  pub fn add(&mut self, amount: u32) {
+    self.balance += amount;
+  }
+
+  pub fn try_close_empty(&mut self) -> bool {
+    if self.balance == 0 {
+      self.open = false;
+      true
+    } else {
+      false
+    }
+  }
 }
 
 serum_common::packable!(Fund);

@@ -8,11 +8,12 @@ use serum_common::pack::Pack;
 use serum_lockup::accounts::TokenVault;
 use solana_sdk::{
   account_info::{next_account_info, AccountInfo},
+  info,
   program_pack::Pack as TokenPack,
   pubkey::Pubkey,
 };
 
-pub fn initialize(
+pub fn initialize<'a>(
   program_id: &'a Pubkey,
   accounts: &'a [AccountInfo],
   owner: Pubkey,
