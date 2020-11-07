@@ -23,34 +23,46 @@ fn main() {
         .about(crate_description!())
         .version(crate_version!())
         .arg({
-          let arg = Arg::with_name("config_file")
-              .short("C")
-              .long("config")
-              .value_name("PATH")
-              .takes_value(true)
-              .global(true)
-              .help("Configuration file to use");
-          if let Some(ref config_file) = *solana_cli_config::CONFIG_FILE {
-              arg.default_value(&config_file)
-          } else {
-              arg
-          }
-      })
+            let arg = Arg::with_name("config_file")
+                .short("c")
+                .long("config")
+                .value_name("PATH")
+                .takes_value(true)
+                .global(true)
+                .help("Configuration file to use");
+            if let Some(ref config_file) = *solana_cli_config::CONFIG_FILE {
+                arg.default_value(&config_file)
+            } else {
+                arg
+            }
+        })
         .subcommand(
             SubCommand::with_name("create")
                 .about("creates a new pool")
-                .arg(
-                  Arg::with_name("owner")
-                      .long("owner")
-                      .value_name("KEYPAIR")
-                      .validator(is_keypair)
-                      .takes_value(true)
-                      .help(
-                          "Specify the pool owner account. \
-                          This may be a keypair file, the ASK keyword. \
-                          Defaults to the client keypair.",
-                      ),
-              )
+        )
+        .subcommand(
+            SubCommand::with_name("list")
+                .about("lists pools user account has access to")
+        )
+        .subcommand(
+            SubCommand::with_name("balance")
+                .about("show the balance of a pool")
+        )
+        .subcommand(
+            SubCommand::with_name("deposit")
+                .about("deposit tokens into a pool")
+        )
+        .subcommand(
+            SubCommand::with_name("proposal")
+                .about("create, view and extract proposals")
+        )
+        .subcommand(
+            SubCommand::with_name("vote")
+                .about("vote on a proposal")
+        )
+        .subcommand(
+            SubCommand::with_name("withdraw")
+                .about("withdraw allocated tokens")
         )
         .get_matches();
     
@@ -93,15 +105,25 @@ fn command_init_pool(config: &Config) {
   let pool = Keypair::new();
   println!("Creating account {}", pool.pubkey());
   
-  let new_pool_tx = Transaction::new_with_payer(
+  let mut new_pool_tx = Transaction::new_with_payer(
       &[fund::initialize(
         &fund::id(),
         &pool.pubkey(),
         config.user.pubkey(),
-        
-      )], 
-      Some(&config.user.pubkey(),
+        100, // hard-coded settings
+        fund::Fundme,
+      )?], 
+      Some(&config.user.pubkey()),
   );
   
+  let (recent_blockhash, fee_calculator) = config.rpc_client.get_recent_blockhash()?;
+  check_fee_payer_balance(config, fee_calculator.calculate_fee(&transaction.message()))?;
+  new_pool_tx.sign(&config.user.as_ref(), recent_blockhash);
+  
+  let signature = config
+      .rpc
+      .send_and_confirm_transaction(&new_pool_tx);
+  println!("Signature: {}", signature);
+  Ok(())
   
 }
