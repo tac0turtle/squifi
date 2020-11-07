@@ -39,7 +39,7 @@ pub fn withdraw<'a>(
         fund_owner_acc_info.key,
         &fund_authority_acc_info.key,
         &[],
-        amount,
+        amount as u64,
       )?;
 
       let fund = Fund::unpack(&fund_acc_info.try_borrow_data()?)?;
@@ -55,8 +55,11 @@ pub fn withdraw<'a>(
         ],
         &[&signer_seeds],
       )?;
+      Ok(())
     },
   )?;
 
   Ok(())
 }
+
+// todo implement access control and state_transistion

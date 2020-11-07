@@ -15,7 +15,7 @@ use solana_sdk::{
 
 pub fn initialize<'a>(
   program_id: &'a Pubkey,
-  accounts: &'a [AccountInfo],
+  accounts: &'a [AccountInfo<'a>],
   owner: Pubkey,
   max_balance: u32,
   fund_type: FundType,
@@ -31,27 +31,15 @@ pub fn initialize<'a>(
   // Create PrgramAccount
 
   // 1. Checks
-  {
-    let _ = Fund::unpack(&fund_acc_info.try_borrow_data()?)?;
-    if fund_acc_info.owner != program_id {
-      return Err(FundErrorCode::NotOwnedByProgram)?;
-    }
-  }
-  {
-    let vault = token(vault_acc_info)?;
-    if vault.state != spl_token::state::AccountState::Initialized {
-      return Err(FundErrorCode::NotInitialized)?;
-    }
-    let vault_authority = Pubkey::create_program_address(
-      &TokenVault::signer_seeds(account_acc_info.key, &0),
-      program_id,
-    )
-    .map_err(|_| FundErrorCode::InvalidVaultNonce)?;
+  let nonce = 0;
 
-    if vault.owner != vault_authority {
-      return Err(FundErrorCode::InvalidVault)?;
-    }
-  }
+  access_control(AccessControlRequest {
+    program_id,
+    fund_acc_info,
+    mint_acc_info,
+    vault_acc_info,
+    nonce,
+  })?;
 
   // 2. Creation
   info!("create program account");
@@ -85,4 +73,65 @@ pub fn initialize<'a>(
   );
 
   Ok(())
+}
+
+fn access_control<'a>(req: AccessControlRequest<'a>) -> Result<(), FundError> {
+  info!("access-control: initialize");
+
+  let AccessControlRequest {
+    program_id,
+    fund_acc_info,
+    mint_acc_info,
+    vault_acc_info,
+    nonce,
+  } = req;
+
+  // {
+  //   let _ = Fund::unpack(&fund_acc_info.try_borrow_data()?)?;
+  //   if fund_acc_info.owner != program_id {
+  //     return Err(FundErrorCode::NotOwnedByProgram)?;
+  //   }
+  // }
+  {
+    let vault = token(vault_acc_info)?;
+    if vault.state != spl_token::state::AccountState::Initialized {
+      return Err(FundErrorCode::NotInitialized)?;
+    }
+    let vault_authority =
+      Pubkey::create_program_address(&TokenVault::signer_seeds(fund_acc_info.key, &0), program_id)
+        .map_err(|_| FundErrorCode::InvalidVaultNonce)?;
+
+    if vault.owner != vault_authority {
+      return Err(FundErrorCode::InvalidVault)?;
+    }
+  }
+  Ok(())
+}
+
+// fn state_transition<'a>(req: StateTransitionRequest<'a>) -> Result<(), FundError> {
+//   let StateTransitionRequest {
+//     fund,
+//     mint,
+//     authority,
+//     nonce,
+//     vault,
+//   } = req;
+
+//   Ok(())
+// }
+
+struct AccessControlRequest<'a> {
+  program_id: &'a Pubkey,
+  fund_acc_info: &'a AccountInfo<'a>,
+  mint_acc_info: &'a AccountInfo<'a>,
+  vault_acc_info: &'a AccountInfo<'a>,
+  nonce: u8,
+}
+
+struct StateTransitionRequest<'a> {
+  fund: &'a mut Fund,
+  mint: &'a Pubkey,
+  authority: Pubkey,
+  vault: Pubkey,
+  nonce: u8,
 }

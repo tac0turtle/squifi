@@ -16,7 +16,6 @@ pub mod instruction {
     /// [writable] Fund to create
     /// [writable] Account to create
     /// [writable] Program controlled tokenvault.
-    /// [] SPL token program
     /// []Mint
     Initialize {
       /// Owner of the Fund
