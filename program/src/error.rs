@@ -19,6 +19,9 @@ pub enum FundError {
     // The proposed state is not valid
     #[error("InvalidState")]
     InvalidState,
+    // The proposed state is not valid
+    #[error("WrongSerialization")]
+    WrongSerialization,
 }
 
 impl From<FundError> for ProgramError {

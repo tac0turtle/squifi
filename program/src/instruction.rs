@@ -6,83 +6,30 @@ use solana_program::program_error::ProgramError;
 use solana_program::pubkey::Pubkey;
 use std::mem::size_of;
 
+use crate::state::FundType;
+
 /// Inital values for the Fund
-#[repr(C)]
-#[derive(Clone, Copy, Debug, Default, PartialEq)]
+#[derive(Clone, Copy, Debug)]
 pub struct InitArgs {
   /// Owner of the Fund
   pub owner: Pubkey, // Optional in the future for when gov spending is implemented?
   /// Max Size of a fund
-  pub max: u8,
+  pub max_balance: u32,
+  /// fund type
+  pub fund_type: FundType,
 }
 
 /// Instructions supported by the Fund program.
-#[repr(C)]
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug)]
 pub enum FundInstruction {
-  /// Initializes a new Fund.
+  /// Initializes a new Fund & Fund Account
   ///
-  /// Fund to create
-  /// Owner
-  /// Fund token
-  /// Token program ID
-  /// InitArgs
+  /// [writable] Fund to create
+  /// [writable] Account to create
+  /// [writable] Program controlled tokenvault.
+  /// [] SPL token program
+  /// []Mint
   Initialize(InitArgs),
 }
 
-impl FundInstruction {
-  pub fn deserialize(input: &[u8]) -> Result<Self, ProgramError> {
-    if input.len() < size_of::<u8>() {
-      return Err(ProgramError::InvalidAccountData);
-    }
-    Ok(match input[0] {
-      0 => {
-        let val: &InitArgs = unpack(input)?;
-        Self::Initialize(*val)
-      }
-      _ => return Err(ProgramError::InvalidAccountData),
-    })
-  }
-
-  pub fn serialize(&self) -> Result<Vec<u8>, ProgramError> {
-    let mut output = vec![0u8; size_of::<FundInstruction>()];
-    match self {
-      Self::Initialize(init) => {
-        output[0] = 0;
-        #[allow(clippy::cast_ptr_alignment)]
-        let value = unsafe { &mut *(&mut output[1] as *mut u8 as *mut InitArgs) };
-        *value = *init;
-      }
-    }
-    Ok(output)
-  }
-}
-
-/// Unpacks a reference from a bytes buffer.
-pub fn unpack<T>(input: &[u8]) -> Result<&T, ProgramError> {
-  if input.len() < size_of::<u8>() + size_of::<T>() {
-    return Err(ProgramError::InvalidAccountData);
-  }
-  #[allow(clippy::cast_ptr_alignment)]
-  let val: &T = unsafe { &*(&input[1] as *const u8 as *const T) };
-  Ok(val)
-}
-
-pub fn initialize(
-  program_id: &Pubkey,
-  mint: &Pubkey,
-  fund: &Pubkey,
-  init_args: InitArgs,
-) -> Result<Instruction, ProgramError> {
-  let init_data = FundInstruction::Initialize(init_args);
-  let data = init_data.serialize()?;
-  let accounts = vec![
-    AccountMeta::new(*fund, true),
-    AccountMeta::new_readonly(*mint, false),
-  ];
-  Ok(Instruction {
-    program_id: *program_id,
-    accounts,
-    data,
-  })
-}
+serum_common::packable!(FundInstruction);
