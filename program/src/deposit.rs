@@ -1,5 +1,6 @@
-use fund::{error::FundError, types::Fund};
-use solana_sdk::{
+use fund::{accounts::fund::Fund, error::FundError};
+use serum_common::pack::Pack;
+use solana_program::{
   account_info::{next_account_info, AccountInfo},
   info,
   program::invoke_signed,

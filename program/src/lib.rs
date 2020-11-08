@@ -14,9 +14,6 @@ mod deposit;
 mod initialize;
 mod withdraw;
 
-pub(crate) mod access_control;
-mod initialize;
-
 entrypoint!(process_instruction);
 fn process_instruction<'a>(
   program_id: &'a Pubkey,

@@ -1,9 +1,9 @@
 use fund::{
+  accounts::fund::Fund,
   error::{FundError, FundErrorCode},
-  types::Fund,
 };
 use serum_common::pack::Pack;
-use solana_sdk::{account_info::AccountInfo, program_pack::Pack as TokenPack, pubkey::Pubkey};
+use solana_program::{account_info::AccountInfo, program_pack::Pack as TokenPack, pubkey::Pubkey};
 
 use spl_token::state::Account as TokenAccount;
 

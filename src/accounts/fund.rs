@@ -34,4 +34,15 @@ pub struct Fund {
   pub vault: Pubkey,
 }
 
+impl Fund {
+  pub fn deduct(&mut self, amount: u32) {
+    if self.balance > 0 {
+      self.balance -= amount;
+    }
+  }
+  pub fn add(&mut self, amount: u32) {
+    self.balance += amount;
+  }
+}
+
 serum_common::packable!(Fund);

@@ -1,6 +1,7 @@
-use fund::{error::FundError, types::Fund};
+use fund::{accounts::fund::Fund, error::FundError};
+use serum_common::pack::Pack;
 use serum_lockup::accounts::token_vault::TokenVault;
-use solana_sdk::{
+use solana_program::{
   account_info::{next_account_info, AccountInfo},
   info,
   program::invoke_signed,
