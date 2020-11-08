@@ -19,7 +19,9 @@ pub mod instruction {
     /// []Mint
     Initialize {
       /// Owner of the Fund
-      owner: Pubkey, // Optional in the future for when gov spending is implemented?
+      owner: Pubkey,
+      /// Authority of the Fund
+      authority: Pubkey,
       /// Max Size of a fund
       max_balance: u32,
       /// fund type

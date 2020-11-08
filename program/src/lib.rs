@@ -26,9 +26,17 @@ fn process_instruction<'a>(
   let result = match instruction {
     FundInstruction::Initialize {
       owner,
+      authority,
       max_balance,
       fund_type,
-    } => initialize::initialize(program_id, accounts, owner, max_balance, fund_type),
+    } => initialize::initialize(
+      program_id,
+      accounts,
+      owner,
+      authority,
+      max_balance,
+      fund_type,
+    ),
   };
 
   result?;
