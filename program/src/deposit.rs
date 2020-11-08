@@ -9,59 +9,98 @@ use solana_program::{
 };
 use spl_token::{instruction::transfer, ID};
 
-pub fn deposit<'a>(
-  progam_id: &'a Pubkey,
-  accounts: &'a [AccountInfo<'a>],
-  amount: u32,
-) -> Result<(), FundError> {
+pub fn handler(progam_id: &Pubkey, accounts: &[AccountInfo], amount: u32) -> Result<(), FundError> {
   info!("process deposit");
 
   let acc_infos = &mut accounts.iter();
 
-  let program_acc_info = next_account_info(acc_infos)?;
+  let vault_acc_info = next_account_info(acc_infos)?;
   let depositor_acc_info = next_account_info(acc_infos)?;
   let depositor_authority_acc_info = next_account_info(acc_infos)?;
   let fund_acc_info = next_account_info(acc_infos)?;
   let token_program_acc_info = next_account_info(acc_infos)?;
 
-  // Validate
+  Fund::unpack_mut(
+    &mut fund_acc_info.try_borrow_mut_data()?,
+    &mut |fund_acc: &mut Fund| {
+      state_transistion(StateTransistionRequest {
+        fund_acc: fund_acc_info,
+        depositor_acc: depositor_acc_info,
+        depositor_authority_acc: depositor_authority_acc_info,
+        vault_acc: vault_acc_info,
+        token_program_acc: token_program_acc_info,
+        amount,
+      })
+      .map_err(Into::into)
+    },
+  )?;
 
+  Ok(())
+}
+
+fn access_control(req: AccessControlRequest) -> Result<(), FundError> {
   // 1. correct fund
   // 2. correct account
   // 3. if provided deposit_amount + balance < max_balance
 
-  Fund::unpack_mut(
-    &mut fund_acc_info.try_borrow_mut_data()?,
-    &mut |fund_acc: &mut Fund| {
-      fund_acc.add(amount);
-      // Send tokens from depositor to fund account.
-      info!("SPL token transfer");
-      // Now transfer SPL funds from the depositor, to the
-      // program-controlled account.
-      {
-        info!("invoke SPL token transfer");
-        let deposit_instruction = transfer(
-          &ID,
-          depositor_acc_info.key,
-          program_acc_info.key,
-          depositor_authority_acc_info.key,
-          &[],
-          amount as u64,
-        )?;
-        invoke_signed(
-          &deposit_instruction,
-          &[
-            depositor_acc_info.clone(),
-            depositor_authority_acc_info.clone(),
-            program_acc_info.clone(),
-            token_program_acc_info.clone(),
-          ],
-          &[],
-        )?;
-        Ok(())
-      }
-    },
-  );
+  let AccessControlRequest {} = req;
 
   Ok(())
+}
+fn state_transistion(req: StateTransistionRequest) -> Result<(), FundError> {
+  let StateTransistionRequest {
+    fund_acc,
+    depositor_acc,
+    vault_acc,
+    depositor_authority_acc,
+    token_program_acc,
+    amount,
+  } = req;
+
+  fund_acc.add(amount);
+  // Send tokens from depositor to fund account.
+  info!("SPL token transfer");
+  // Now transfer SPL funds from the depositor, to the
+  // program-controlled account.
+  {
+    info!("invoke SPL token transfer");
+    let deposit_instruction = transfer(
+      &ID,
+      depositor_acc.key,
+      vault_acc.key,
+      depositor_authority_acc.key,
+      &[],
+      amount as u64,
+    )?;
+    invoke_signed(
+      &deposit_instruction,
+      &[
+        depositor_acc.clone(),
+        depositor_authority_acc.clone(),
+        vault_acc.clone(),
+        token_program_acc.clone(),
+      ],
+      &[],
+    )?;
+
+    Ok(())
+  }
+}
+
+struct AccessControlRequest<'a, 'b> {
+  program_id: &'a Pubkey,
+  amount: u64,
+  fund_acc_info: &'a AccountInfo<'b>,
+  depositor_authority_acc_info: &'a AccountInfo<'b>,
+  vault_acc_info: &'a AccountInfo<'b>,
+  vault_authority_acc_info: &'a AccountInfo<'b>,
+}
+
+struct StateTransistionRequest<'a, 'b, 'c> {
+  fund_acc: &'c mut Fund,
+  depositor_acc: &'a AccountInfo<'b>,
+  depositor_authority_acc: &'a AccountInfo<'b>,
+  vault_acc: &'a AccountInfo<'b>,
+  token_program_acc: &'a AccountInfo<'b>,
+  amount: u32,
 }

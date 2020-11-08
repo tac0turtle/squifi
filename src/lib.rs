@@ -17,6 +17,7 @@ pub mod instruction {
     /// 2. `[writable]` Account to create
     /// 3. `[writable]` Program controlled tokenvault.
     /// 4. `[]`         Mint
+    /// 5. `[]` todo add rent sysvar
     Initialize {
       /// Owner of the Fund
       owner: Pubkey,
@@ -29,19 +30,20 @@ pub mod instruction {
     },
     /// Deposit sends tokens to a fund.
     ///
-    /// [writable] Prgram account
-    /// [writable] Depositor
-    /// [signer] Depositor authority
-    /// [] Fund
-    /// [] SPL token program
+    /// `[writable]` Prgram controlled token vault
+    /// `[writable]` Depositor token account
+    /// `[signer]`   Depositor authority
+    /// `[]`         Fund
+    /// `[]`         Fund Authority
+    /// `[]`         SPL token program
     Deposit { amount: u32 },
     /// Withdraw funds from program account.
     ///
-    /// [writable] fund owner
-    /// [writable] fund to withrdraw from
-    /// [writable] program accounr
-    /// [] fund authority
-    /// [] SPL token program
+    /// `[writable]` Fund owner
+    /// `[writable]` Fund to withrdraw from
+    /// `[writable]` Program controlled tokenvault
+    /// `[]` Fund Authority
+    /// `[]` SPL token program
     Withdraw { amount: u32 },
   }
 }

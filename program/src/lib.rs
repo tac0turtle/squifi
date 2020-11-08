@@ -39,8 +39,8 @@ fn process_instruction<'a>(
       max_balance,
       fund_type,
     ),
-    FundInstruction::Deposit { amount } => deposit::deposit(program_id, accounts, amount),
-    FundInstruction::Withdraw { amount } => deposit::deposit(program_id, accounts, amount),
+    FundInstruction::Deposit { amount } => deposit::handler(program_id, accounts, amount),
+    FundInstruction::Withdraw { amount } => deposit::handler(program_id, accounts, amount),
   };
 
   result?;
