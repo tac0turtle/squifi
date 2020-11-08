@@ -1,10 +1,9 @@
-use crate::types::FundType;
 use serde::{Deserialize, Serialize};
 use serum_common::pack::*;
 use solana_client_gen::prelude::*;
 
+pub mod accounts;
 pub mod error;
-pub mod types;
 
 #[cfg_attr(feature = "client", solana_client_gen)]
 pub mod instruction {
@@ -13,10 +12,11 @@ pub mod instruction {
   pub enum FundInstruction {
     /// Initializes a new Fund & Fund Account
     ///
-    /// [writable] Fund to create
-    /// [writable] Account to create
-    /// [writable] Program controlled tokenvault.
-    /// []Mint
+    /// 0. `[]`         Vault.
+    /// 1. `[writable]` Fund to create
+    /// 2. `[writable]` Account to create
+    /// 3. `[writable]` Program controlled tokenvault.
+    /// 4. `[]`         Mint
     Initialize {
       /// Owner of the Fund
       owner: Pubkey,
@@ -25,7 +25,7 @@ pub mod instruction {
       /// Max Size of a fund
       max_balance: u32,
       /// fund type
-      fund_type: FundType,
+      fund_type: accounts::fund::FundType,
     },
   }
 }

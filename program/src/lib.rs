@@ -29,7 +29,7 @@ fn process_instruction<'a>(
       authority,
       max_balance,
       fund_type,
-    } => initialize::initialize(
+    } => initialize::handler(
       program_id,
       accounts,
       owner,
