@@ -20,7 +20,7 @@ pub fn handler<'a>(
   accounts: &'a [AccountInfo<'a>],
   owner: Pubkey,
   authority: Pubkey,
-  max_balance: u32,
+  max_balance: u64,
   fund_type: FundType,
 ) -> Result<(), FundError> {
   info!("Initialize Fund");
@@ -149,5 +149,5 @@ struct StateTransitionRequest<'a> {
   authority: Pubkey,
   fund_type: FundType,
   nonce: u8,
-  max_balance: u32,
+  max_balance: u64,
 }

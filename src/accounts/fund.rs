@@ -23,9 +23,9 @@ pub struct Fund {
   /// Owner authority
   pub authority: Pubkey,
   /// max size of the fund
-  pub max_balance: u32,
+  pub max_balance: u64,
   /// balance of the
-  pub balance: u32,
+  pub balance: u64,
   /// Nonce of the program account
   pub nonce: u8,
   /// Mint
@@ -35,12 +35,12 @@ pub struct Fund {
 }
 
 impl Fund {
-  pub fn deduct(&mut self, amount: u32) {
+  pub fn deduct(&mut self, amount: u64) {
     if self.balance > 0 {
       self.balance -= amount;
     }
   }
-  pub fn add(&mut self, amount: u32) {
+  pub fn add(&mut self, amount: u64) {
     self.balance += amount;
   }
 }

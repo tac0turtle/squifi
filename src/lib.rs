@@ -24,27 +24,26 @@ pub mod instruction {
       /// Authority of the Fund
       authority: Pubkey,
       /// Max Size of a fund
-      max_balance: u32,
+      max_balance: u64,
       /// fund type
       fund_type: accounts::fund::FundType,
     },
     /// Deposit sends tokens to a fund.
     ///
-    /// `[writable]` Prgram controlled token vault
-    /// `[writable]` Depositor token account
-    /// `[signer]`   Depositor authority
-    /// `[]`         Fund
-    /// `[]`         Fund Authority
-    /// `[]`         SPL token program
-    Deposit { amount: u32 },
+    /// 0. `[writable]` Vault
+    /// 1. `[writable]` Depositor token account
+    /// 2. `[signer]`   Depositor authority
+    /// 3. `[]`         Fund
+    /// 4. `[]`         SPL token program
+    Deposit { amount: u64 },
     /// Withdraw funds from program account.
     ///
-    /// `[writable]` Fund owner
-    /// `[writable]` Fund to withrdraw from
-    /// `[writable]` Program controlled tokenvault
-    /// `[]` Fund Authority
-    /// `[]` SPL token program
-    Withdraw { amount: u32 },
+    /// 0. `[writable]` Tokenvault
+    /// 1. `[writable]` Fund to transfer tokens out of
+    /// 2. `[]`         Account to withdraw to
+    /// 3. `[]`         Fund Authority
+    /// 4. `[]`         SPL token program
+    Withdraw { amount: u64 },
   }
 }
 
