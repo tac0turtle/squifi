@@ -2,12 +2,12 @@
 
 use crate::access_control::token;
 use fund::{
+  accounts::fund::{Fund, FundType},
   error::{FundError, FundErrorCode},
-  types::{Account as FundAccount, Fund, FundType},
 };
 use serum_common::pack::Pack;
 use serum_lockup::accounts::TokenVault;
-use solana_sdk::{
+use solana_program::{
   account_info::{next_account_info, AccountInfo},
   info,
   program_pack::Pack as TokenPack,
@@ -15,7 +15,7 @@ use solana_sdk::{
 };
 use std::convert::Into;
 
-pub fn initialize<'a>(
+pub fn handler<'a>(
   program_id: &'a Pubkey,
   accounts: &'a [AccountInfo<'a>],
   owner: Pubkey,
@@ -43,16 +43,6 @@ pub fn initialize<'a>(
     nonce: 0,
   })?;
 
-  // 2. Creation
-  info!("create program account");
-  FundAccount::unpack_mut(
-    &mut account_acc_info.try_borrow_mut_data()?,
-    &mut |acc: &mut FundAccount| {
-      acc.mint = *mint_acc_info.key;
-      acc.vault = *vault_acc_info.key;
-      Ok(())
-    },
-  );
   // create a fund
   // 1. Checks
   let _ = Fund::unpack(&fund_acc_info.try_borrow_data()?)?;
@@ -69,7 +59,8 @@ pub fn initialize<'a>(
         fund_acc,
         owner,
         authority,
-        account: vault_acc_info.key.clone(),
+        mint: mint_acc_info.key,
+        vault: *vault_acc_info.key,
         fund_type,
         nonce: 0,
         max_balance,
@@ -121,7 +112,8 @@ fn state_transition<'a>(req: StateTransitionRequest<'a>) -> Result<(), FundError
     fund_acc,
     owner,
     authority,
-    account,
+    vault,
+    mint,
     fund_type,
     nonce,
     max_balance,
@@ -130,7 +122,8 @@ fn state_transition<'a>(req: StateTransitionRequest<'a>) -> Result<(), FundError
   fund_acc.open = true;
   fund_acc.owner = owner;
   fund_acc.authority = authority;
-  fund_acc.account = account;
+  fund_acc.vault = vault;
+  fund_acc.mint = *mint;
   fund_acc.max_balance = max_balance;
   fund_acc.balance = 0;
   fund_acc.fund_type = fund_type;
@@ -152,8 +145,9 @@ struct AccessControlRequest<'a> {
 struct StateTransitionRequest<'a> {
   fund_acc: &'a mut Fund,
   owner: Pubkey,
+  mint: &'a Pubkey,
+  vault: Pubkey,
   authority: Pubkey,
-  account: Pubkey,
   fund_type: FundType,
   nonce: u8,
   max_balance: u32,
