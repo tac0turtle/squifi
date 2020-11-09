@@ -2,11 +2,11 @@ use serde::{Deserialize, Serialize};
 use serum_common::pack::*;
 use solana_client_gen::solana_sdk::pubkey::Pubkey;
 
-#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq)]
 pub enum FundType {
   /// similar to a gofundme
   FundMe,
-  // Raise,
+  PublicRaise,
 }
 
 /// The Owner of the fund has the right to withdraw all or some of the funds
@@ -32,6 +32,15 @@ pub struct Fund {
   pub mint: Pubkey,
   /// Address of the token vault controlled by the Safe.
   pub vault: Pubkey,
+
+  /// Params
+
+  /// shares
+  pub shares: u64,
+  /// nft account
+  pub nft_account: Pubkey,
+  /// nft mint
+  pub nft_mint: Pubkey,
 }
 
 impl Fund {

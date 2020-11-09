@@ -27,6 +27,8 @@ pub fn handler(
   let withdraw_acc_info = next_account_info(acc_infos)?;
   let vault_authority_acc_info = next_account_info(acc_infos)?;
   let token_program_acc_info = next_account_info(acc_infos)?;
+  let nft_mint_acc_info = next_account_info(acc_infos)?;
+  let nft_token_acc_info = next_account_info(acc_infos)?;
 
   access_control(AccessControlRequest {
     program_id,
@@ -59,7 +61,7 @@ pub fn handler(
 fn access_control(req: AccessControlRequest) -> Result<(), FundError> {
   let AccessControlRequest {
     program_id,
-    amount,
+    amount: _,
     fund_acc_info,
     withdraw_acc_info,
     vault_acc_info,
@@ -95,30 +97,45 @@ fn state_transistion(req: StateTransistionRequest) -> Result<(), FundError> {
     amount,
   } = req;
 
-  fund_acc.deduct(amount);
-  // transfer from program account to owner of fund
-  info!("invoking token transfer");
-  let withdraw_instruction = transfer(
-    &ID,
-    vault_acc_info.key,
-    withdraw_acc_info.key,
-    &vault_authority_acc_info.key,
-    &[],
-    amount as u64,
-  )?;
+  {
+    if fund_acc.fund_type.eq(FundType::PublicRaise) {
+      let burn_instruction = instruction::burn(
+        &spl_token::ID,
+        nft_token_acc_info.key,
+        nft_mint_acc_info.key,
+        &vesting_acc.beneficiary,
+        &[],
+        amount,
+      )?;
+      solana_sdk::program::invoke_signed(&burn_instruction, &accounts[..], &[])?;
+    }
+  }
+  {
+    fund_acc.deduct(amount);
+    // transfer from program account to owner of fund
+    info!("invoking token transfer");
+    let withdraw_instruction = transfer(
+      &ID,
+      vault_acc_info.key,
+      withdraw_acc_info.key,
+      &vault_authority_acc_info.key,
+      &[],
+      amount as u64,
+    )?;
 
-  let signer_seeds = TokenVault::signer_seeds(fund_acc_info.key, &fund_acc.nonce);
+    let signer_seeds = TokenVault::signer_seeds(fund_acc_info.key, &fund_acc.nonce);
 
-  invoke_signed(
-    &withdraw_instruction,
-    &[
-      vault_acc_info.clone(),
-      withdraw_acc_info.clone(),
-      vault_authority_acc_info.clone(),
-      token_program_acc_info.clone(),
-    ],
-    &[&signer_seeds],
-  )?;
+    invoke_signed(
+      &withdraw_instruction,
+      &[
+        vault_acc_info.clone(),
+        withdraw_acc_info.clone(),
+        vault_authority_acc_info.clone(),
+        token_program_acc_info.clone(),
+      ],
+      &[&signer_seeds],
+    )?;
+  }
 
   Ok(())
 }

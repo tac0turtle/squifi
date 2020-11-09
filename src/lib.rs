@@ -34,7 +34,9 @@ pub mod instruction {
     /// 2. `[signer]`   Depositor authority
     /// 3. `[]`         Fund
     /// 4. `[]`         Vault Authority
-    /// 4. `[]`         SPL token program
+    /// 5. `[]`         SPL token program
+    /// 6. `[writable]` Token mint representing the investment receipt.
+    /// 7  `[writable]` Token account associated with the mint.
     Deposit { amount: u64 },
     /// Withdraw funds from program account.
     ///
@@ -43,6 +45,8 @@ pub mod instruction {
     /// 2. `[]`         Account to withdraw to
     /// 3. `[]`         Fund Authority
     /// 4. `[]`         SPL token program
+    /// 5. `[writable]` NFT token being redeemed.
+    /// 6. `[writable]` NFT mint to burn the token being redeemed.
     Withdraw { amount: u64 },
   }
 }
