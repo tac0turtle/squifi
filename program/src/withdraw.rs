@@ -1,17 +1,16 @@
 use crate::access_control;
 use fund::{
-  accounts::fund::Fund,
+  accounts::fund::{Fund, FundType},
   error::{FundError, FundErrorCode},
 };
 use serum_common::pack::Pack;
 use serum_lockup::accounts::token_vault::TokenVault;
 use solana_program::{
   account_info::{next_account_info, AccountInfo},
-  info,
-  program::invoke_signed,
+  info, program,
   pubkey::Pubkey,
 };
-use spl_token::{instruction::transfer, ID};
+use spl_token::{instruction, ID};
 use std::convert::Into;
 
 pub fn handler(
@@ -43,12 +42,15 @@ pub fn handler(
     &mut fund_acc_info.try_borrow_mut_data()?,
     &mut |fund_acc: &mut Fund| {
       state_transistion(StateTransistionRequest {
+        accounts,
         fund_acc,
         fund_acc_info,
         withdraw_acc_info,
         vault_acc_info,
         vault_authority_acc_info,
         token_program_acc_info,
+        nft_token_acc_info,
+        nft_mint_acc_info,
         amount,
       })
       .map_err(Into::into)
@@ -89,32 +91,35 @@ fn access_control(req: AccessControlRequest) -> Result<(), FundError> {
 fn state_transistion(req: StateTransistionRequest) -> Result<(), FundError> {
   let StateTransistionRequest {
     fund_acc,
+    accounts,
     fund_acc_info,
     withdraw_acc_info,
     vault_acc_info,
     vault_authority_acc_info,
     token_program_acc_info,
+    nft_mint_acc_info,
+    nft_token_acc_info,
     amount,
   } = req;
 
   {
-    if fund_acc.fund_type.eq(FundType::PublicRaise) {
+    if fund_acc.fund_type.eq(&FundType::PublicRaise) {
       let burn_instruction = instruction::burn(
         &spl_token::ID,
         nft_token_acc_info.key,
         nft_mint_acc_info.key,
-        &vesting_acc.beneficiary,
+        &withdraw_acc_info.key,
         &[],
         amount,
       )?;
-      solana_sdk::program::invoke_signed(&burn_instruction, &accounts[..], &[])?;
+      program::invoke_signed(&burn_instruction, &accounts[..], &[])?;
     }
   }
   {
     fund_acc.deduct(amount);
     // transfer from program account to owner of fund
     info!("invoking token transfer");
-    let withdraw_instruction = transfer(
+    let withdraw_instruction = instruction::transfer(
       &ID,
       vault_acc_info.key,
       withdraw_acc_info.key,
@@ -125,7 +130,7 @@ fn state_transistion(req: StateTransistionRequest) -> Result<(), FundError> {
 
     let signer_seeds = TokenVault::signer_seeds(fund_acc_info.key, &fund_acc.nonce);
 
-    invoke_signed(
+    program::invoke_signed(
       &withdraw_instruction,
       &[
         vault_acc_info.clone(),
@@ -151,7 +156,10 @@ struct AccessControlRequest<'a, 'b> {
 
 struct StateTransistionRequest<'a, 'b, 'c> {
   fund_acc: &'c mut Fund,
+  accounts: &'a [AccountInfo<'b>],
   fund_acc_info: &'a AccountInfo<'b>,
+  nft_token_acc_info: &'a AccountInfo<'b>,
+  nft_mint_acc_info: &'a AccountInfo<'b>,
   withdraw_acc_info: &'a AccountInfo<'b>,
   vault_acc_info: &'a AccountInfo<'b>,
   vault_authority_acc_info: &'a AccountInfo<'b>,
