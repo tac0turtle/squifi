@@ -14,19 +14,36 @@ pub mod instruction {
     ///
     /// 0. `[]`         Vault.
     /// 1. `[writable]` Fund to create
-    /// 2. `[writable]` Account to create
-    /// 3. `[writable]` Program controlled tokenvault.
-    /// 4. `[]`         Mint
+    /// 2. `[writable]` Program controlled tokenvault.
+    /// 3. `[]`         Mint
+    /// 4. `[]` todo add rent sysvar
     Initialize {
       /// Owner of the Fund
       owner: Pubkey,
       /// Authority of the Fund
       authority: Pubkey,
       /// Max Size of a fund
-      max_balance: u32,
+      max_balance: u64,
       /// fund type
       fund_type: accounts::fund::FundType,
     },
+    /// Deposit sends tokens to a fund.
+    ///
+    /// 0. `[writable]` Vault
+    /// 1. `[writable]` Depositor token account
+    /// 2. `[signer]`   Depositor authority
+    /// 3. `[]`         Fund
+    /// 4. `[]`         Vault Authority
+    /// 4. `[]`         SPL token program
+    Deposit { amount: u64 },
+    /// Withdraw funds from program account.
+    ///
+    /// 0. `[writable]` Tokenvault
+    /// 1. `[writable]` Fund to transfer tokens out of
+    /// 2. `[]`         Account to withdraw to
+    /// 3. `[]`         Fund Authority
+    /// 4. `[]`         SPL token program
+    Withdraw { amount: u64 },
   }
 }
 

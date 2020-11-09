@@ -17,6 +17,7 @@ num_enum = "0.5.0"
 thiserror = "1.0.20"
 serum-common = { git = "https://github.com/project-serum/serum-dex" }
 solana-client-gen = { git = "https://github.com/project-serum/serum-dex" }
+bytemuck = "1.4.1"
 
 # Client only.
 lazy_static = { version = "1.4.0", optional = true }

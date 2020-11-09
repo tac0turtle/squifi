@@ -10,7 +10,9 @@ use solana_program::{
 };
 
 pub(crate) mod access_control;
+mod deposit;
 mod initialize;
+mod withdraw;
 
 entrypoint!(process_instruction);
 fn process_instruction<'a>(
@@ -37,6 +39,8 @@ fn process_instruction<'a>(
       max_balance,
       fund_type,
     ),
+    FundInstruction::Deposit { amount } => deposit::handler(program_id, accounts, amount),
+    FundInstruction::Withdraw { amount } => withdraw::handler(program_id, accounts, amount),
   };
 
   result?;
