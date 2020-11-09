@@ -1,4 +1,8 @@
-use fund::{accounts::fund::Fund, error::FundError};
+use crate::access_control;
+use fund::{
+  accounts::fund::Fund,
+  error::{FundError, FundErrorCode},
+};
 use serum_common::pack::Pack;
 use serum_lockup::accounts::token_vault::TokenVault;
 use solana_program::{
@@ -10,7 +14,11 @@ use solana_program::{
 use spl_token::{instruction::transfer, ID};
 use std::convert::Into;
 
-pub fn handler(progam_id: &Pubkey, accounts: &[AccountInfo], amount: u64) -> Result<(), FundError> {
+pub fn handler(
+  program_id: &Pubkey,
+  accounts: &[AccountInfo],
+  amount: u64,
+) -> Result<(), FundError> {
   info!("handler: withdraw");
 
   let acc_infos = &mut accounts.iter();
@@ -20,7 +28,14 @@ pub fn handler(progam_id: &Pubkey, accounts: &[AccountInfo], amount: u64) -> Res
   let vault_authority_acc_info = next_account_info(acc_infos)?;
   let token_program_acc_info = next_account_info(acc_infos)?;
 
-  // access_control(AccessControlRequest {});
+  access_control(AccessControlRequest {
+    program_id,
+    amount,
+    fund_acc_info,
+    withdraw_acc_info,
+    vault_acc_info,
+    vault_authority_acc_info,
+  })?;
 
   Fund::unpack_mut(
     &mut fund_acc_info.try_borrow_mut_data()?,
@@ -42,12 +57,33 @@ pub fn handler(progam_id: &Pubkey, accounts: &[AccountInfo], amount: u64) -> Res
 }
 
 fn access_control(req: AccessControlRequest) -> Result<(), FundError> {
-  // let AccessControlRequest {} = req;
-  // validate
-  // 1. check owner of fund is owner in message
-  // 2. check balance is greater than x of
+  let AccessControlRequest {
+    program_id,
+    amount,
+    fund_acc_info,
+    withdraw_acc_info,
+    vault_acc_info,
+    vault_authority_acc_info,
+  } = req;
+  // todo: check balance
+
+  if !withdraw_acc_info.is_signer {
+    return Err(FundErrorCode::Unauthorized)?;
+  }
+
+  let _ = access_control::fund(fund_acc_info, program_id)?;
+  let _ = access_control::vault_join(
+    vault_acc_info,
+    vault_authority_acc_info,
+    fund_acc_info,
+    program_id,
+  )?;
+
+  let _ = access_control::withdraw(program_id, fund_acc_info, withdraw_acc_info);
+
   Ok(())
 }
+
 fn state_transistion(req: StateTransistionRequest) -> Result<(), FundError> {
   let StateTransistionRequest {
     fund_acc,
@@ -87,8 +123,13 @@ fn state_transistion(req: StateTransistionRequest) -> Result<(), FundError> {
   Ok(())
 }
 
-struct AccessControlRequest<'a> {
-  program_is: &'a Pubkey,
+struct AccessControlRequest<'a, 'b> {
+  program_id: &'a Pubkey,
+  amount: u64,
+  fund_acc_info: &'a AccountInfo<'b>,
+  withdraw_acc_info: &'a AccountInfo<'b>,
+  vault_acc_info: &'a AccountInfo<'b>,
+  vault_authority_acc_info: &'a AccountInfo<'b>,
 }
 
 struct StateTransistionRequest<'a, 'b, 'c> {

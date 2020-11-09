@@ -9,11 +9,11 @@ pub enum FundType {
   // Raise,
 }
 
-/// Initialized program details.
-/// Fund is a program account.
 /// The Owner of the fund has the right to withdraw all or some of the funds
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Fund {
+  /// check to see if a fund is ininitialized
+  pub initialized: bool,
   /// open defines if a fund is open for deposits
   pub open: bool,
   /// type of fund

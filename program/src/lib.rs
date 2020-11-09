@@ -40,7 +40,7 @@ fn process_instruction<'a>(
       fund_type,
     ),
     FundInstruction::Deposit { amount } => deposit::handler(program_id, accounts, amount),
-    FundInstruction::Withdraw { amount } => deposit::handler(program_id, accounts, amount),
+    FundInstruction::Withdraw { amount } => withdraw::handler(program_id, accounts, amount),
   };
 
   result?;
