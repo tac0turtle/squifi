@@ -1,5 +1,5 @@
 [package]
-name = "fund-program"
+name = "spool-fund"
 version = "0.1.0"
 authors = ["Marko Baricevic <marbar3778@yahoo.com>"]
 repository = "https://github.com/marbar3778/squad_finance"
@@ -9,7 +9,7 @@ edition = "2018"
 
 [lib]
 crate-type = ["cdylib", "lib"]
-name = "fund_program"
+name = "spool_fund"
 
 [features]
 program = ["serum-lockup/program", "solana-sdk/program", "spl-token/program", "spl-token/no-entrypoint"]

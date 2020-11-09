@@ -1,5 +1,5 @@
 [package]
-name = "spool"
+name = "spool-cli"
 version = "0.1.0"
 authors = ["Callum Michael Waters <cmwaters19@gmail.com>", "Marko Baricevic <marbar3778@yahoo.com>"]
 edition = "2018"
@@ -12,4 +12,9 @@ solana-clap-utils = "1.4.5"
 solana-client = "1.4.5"
 solana-cli-config = "1.4.5"
 solana-sdk = "1.4.5"
-fund-program = { path="../program" }
+spool-fund = { path="../program" }
+
+[[bin]]
+name = "spool"
+path = "src/main.rs"
+
