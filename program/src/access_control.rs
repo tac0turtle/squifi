@@ -1,8 +1,7 @@
 use fund::error::{FundError, FundErrorCode};
 use serum_common::pack::Pack;
-use solana_sdk::{account_info::AccountInfo, program_pack::Pack as TokenPack};
+use solana_program::{account_info::AccountInfo, program_pack::Pack as TokenPack};
 use spl_token::state::Account as TokenAccount;
-use std::convert::Into;
 
 pub fn token(acc_info: &AccountInfo) -> Result<TokenAccount, FundError> {
   if *acc_info.owner != spl_token::ID {

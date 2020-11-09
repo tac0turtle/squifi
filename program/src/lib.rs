@@ -18,7 +18,7 @@ mod initialize;
 
 entrypoint!(process_instruction);
 fn process_instruction<'a>(
-  program_id: &Pubkey,
+  program_id: &'a Pubkey,
   accounts: &'a [AccountInfo<'a>],
   instruction_data: &[u8],
 ) -> ProgramResult {
@@ -30,9 +30,17 @@ fn process_instruction<'a>(
   let result = match instruction {
     FundInstruction::Initialize {
       owner,
+      authority,
       max_balance,
       fund_type,
-    } => initialize::initialize(program_id, accounts, owner, max_balance, fund_type),
+    } => initialize::handler(
+      program_id,
+      accounts,
+      owner,
+      authority,
+      max_balance,
+      fund_type,
+    ),
   };
 
   result?;
