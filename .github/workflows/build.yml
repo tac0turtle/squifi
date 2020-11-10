@@ -5,7 +5,7 @@ on:
     branches:
       - master
 jobs:
-  clippy_check:
+  build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
