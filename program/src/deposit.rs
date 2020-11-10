@@ -72,7 +72,7 @@ fn access_control(req: AccessControlRequest) -> Result<(), FundError> {
 
   let AccessControlRequest {
     program_id,
-    amount: _, //todo check amount
+    amount,
     fund_acc_info,
     depositor_authority_acc_info,
     vault_acc_info,
@@ -82,15 +82,18 @@ fn access_control(req: AccessControlRequest) -> Result<(), FundError> {
   if !depositor_authority_acc_info.is_signer {
     return Err(FundErrorCode::Unauthorized)?;
   }
+  {
+    // let rent = access_control::rent(rent_acc_info)?;
+    let _ = access_control::fund(fund_acc_info, program_id)?;
+    let _ = access_control::vault_join(
+      vault_acc_info,
+      vault_authority_acc_info,
+      fund_acc_info,
+      program_id,
+    )?;
 
-  // let rent = access_control::rent(rent_acc_info)?;
-  let _ = access_control::fund(fund_acc_info, program_id)?;
-  let _ = access_control::vault_join(
-    vault_acc_info,
-    vault_authority_acc_info,
-    fund_acc_info,
-    program_id,
-  )?;
+    let _ = access_control::check_balance(fund_acc_info, amount)?;
+  }
 
   Ok(())
 }

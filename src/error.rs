@@ -26,6 +26,7 @@ pub enum FundErrorCode {
     Unauthorized = 10,
     InvalidRentSysvar = 11,
     InvalidAccount = 12,
+    FundBalanceOverflow = 13,
 }
 
 impl std::fmt::Display for FundErrorCode {

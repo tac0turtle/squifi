@@ -71,19 +71,20 @@ fn access_control(req: AccessControlRequest) -> Result<(), FundError> {
     vault_acc_info,
     vault_authority_acc_info,
   } = req;
-  // todo: check balance
 
   if !withdraw_acc_info.is_signer {
     return Err(FundErrorCode::Unauthorized)?;
   }
 
-  let _ = access_control::fund(fund_acc_info, program_id)?;
-  let _ = access_control::vault_join(
-    vault_acc_info,
-    vault_authority_acc_info,
-    fund_acc_info,
-    program_id,
-  )?;
+  {
+    let _ = access_control::fund(fund_acc_info, program_id)?;
+    let _ = access_control::vault_join(
+      vault_acc_info,
+      vault_authority_acc_info,
+      fund_acc_info,
+      program_id,
+    )?;
+  }
 
   let _ = access_control::withdraw(program_id, fund_acc_info, withdraw_acc_info);
 
