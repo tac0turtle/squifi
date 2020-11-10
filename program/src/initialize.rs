@@ -2,11 +2,14 @@
 
 use crate::access_control;
 use fund::{
-  accounts::fund::{Fund, FundType},
+  accounts::{
+    fund::{Fund, FundType},
+    vault::TokenVault,
+  },
   error::{FundError, FundErrorCode},
 };
 use serum_common::pack::Pack;
-use serum_lockup::accounts::TokenVault;
+
 use solana_program::{
   account_info::{next_account_info, AccountInfo},
   info,
@@ -14,9 +17,9 @@ use solana_program::{
 };
 use std::convert::Into;
 
-pub fn handler<'a>(
-  program_id: &'a Pubkey,
-  accounts: &'a [AccountInfo<'a>],
+pub fn handler(
+  program_id: &Pubkey,
+  accounts: &[AccountInfo],
   owner: Pubkey,
   authority: Pubkey,
   max_balance: u64,
@@ -59,7 +62,7 @@ pub fn handler<'a>(
   Ok(())
 }
 
-fn access_control<'a>(req: AccessControlRequest<'a>) -> Result<(), FundError> {
+fn access_control(req: AccessControlRequest) -> Result<(), FundError> {
   info!("access-control: initialize");
 
   let AccessControlRequest {
@@ -102,7 +105,7 @@ fn access_control<'a>(req: AccessControlRequest<'a>) -> Result<(), FundError> {
   Ok(())
 }
 
-fn state_transition<'a>(req: StateTransitionRequest<'a>) -> Result<(), FundError> {
+fn state_transition(req: StateTransitionRequest) -> Result<(), FundError> {
   info!("state-transition: initialize");
 
   let StateTransitionRequest {
@@ -132,11 +135,11 @@ fn state_transition<'a>(req: StateTransitionRequest<'a>) -> Result<(), FundError
   Ok(())
 }
 
-struct AccessControlRequest<'a> {
+struct AccessControlRequest<'a, 'b> {
   program_id: &'a Pubkey,
-  fund_acc_info: &'a AccountInfo<'a>,
-  mint_acc_info: &'a AccountInfo<'a>,
-  vault_acc_info: &'a AccountInfo<'a>,
+  fund_acc_info: &'a AccountInfo<'b>,
+  mint_acc_info: &'a AccountInfo<'b>,
+  vault_acc_info: &'a AccountInfo<'b>,
   nonce: u8,
 }
 
