@@ -1,9 +1,10 @@
-name: Clippy check
+name: Lint
 on:
   pull_request:
   push:
     branches:
       - master
+
 jobs:
   clippy_check:
     runs-on: ubuntu-latest
