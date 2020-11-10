@@ -35,7 +35,7 @@ pub struct Fund {
 
   /// Params
 
-  /// shares
+  /// shares, shares increment with investment, but do not decrement with withdraw
   pub shares: u64,
   /// nft account
   pub nft_account: Pubkey,
@@ -49,8 +49,12 @@ impl Fund {
       self.balance -= amount;
     }
   }
+  /// Add adds the depoist amount to the total balance and shares
   pub fn add(&mut self, amount: u64) {
     self.balance += amount;
+    if self.fund_type.eq(&FundType::PublicRaise) {
+      self.shares += amount;
+    }
   }
 }
 

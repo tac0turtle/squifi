@@ -1,6 +1,9 @@
 use crate::access_control;
 use fund::{
-  accounts::{fund::Fund, vault::TokenVault},
+  accounts::{
+    fund::{Fund, FundType},
+    vault::TokenVault,
+  },
   error::{FundError, FundErrorCode},
 };
 use serum_common::pack::Pack;

@@ -109,19 +109,21 @@ fn state_transistion(req: StateTransistionRequest) -> Result<(), FundError> {
     amount,
   } = req;
 
-  if fund_acc.fund_type.eq(&FundType::PublicRaise) {
-    let mint_to_instr = instruction::mint_to(
-      &spl_token::ID,
-      nft_mint_acc_info.key,
-      nft_token_acc_info.key,
-      vault_authority_acc_info.key,
-      &[],
-      amount,
-    )?;
+  {
+    if fund_acc.fund_type.eq(&FundType::PublicRaise) {
+      let mint_to_instr = instruction::mint_to(
+        &spl_token::ID,
+        nft_mint_acc_info.key,
+        nft_token_acc_info.key,
+        vault_authority_acc_info.key,
+        &[],
+        amount,
+      )?;
 
-    let signer_seeds = TokenVault::signer_seeds(fund_acc_info.key, &fund_acc.nonce);
+      let signer_seeds = TokenVault::signer_seeds(fund_acc_info.key, &fund_acc.nonce);
 
-    program::invoke_signed(&mint_to_instr, &accounts[..], &[&signer_seeds])?;
+      program::invoke_signed(&mint_to_instr, &accounts[..], &[&signer_seeds])?;
+    }
   }
 
   fund_acc.add(amount);
