@@ -26,13 +26,30 @@ Squfi has multiple types of funds a user can create. All funds have a max that w
 - ETF
   - Coming soon..
 
-# Deployment
+## Deployment
 
-<!-- TODO: deployment instructions -->
+### Build
 
-# CLI Walkthrough
+For development cargo build can be used:
 
-<!-- TODO: deployment instructions -->
+```sh
+cargo build --features program
+```
+
+To build the smart-contract for deployment it must be built for the solana BPF target.
+
+> Note: install build-bpf is required. Instructions can be found in the Solana documentation, [here](https://docs.solana.com/cli/install-solana-cli-tools)
+
+BPF Target:
+
+```sh
+cargo build-bpf --features program
+```
+
+## CLI Walkthrough
+
+TODO
+
 ## Features
 
 - [x] Create funding pool
