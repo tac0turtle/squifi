@@ -88,6 +88,8 @@ fn access_control(req: AccessControlRequest) -> Result<(), FundError> {
 
   let _ = access_control::withdraw(program_id, fund_acc_info, withdraw_acc_info);
 
+  info!("access control withdraw success")
+
   Ok(())
 }
 
@@ -144,6 +146,8 @@ fn state_transistion(req: StateTransistionRequest) -> Result<(), FundError> {
       &[&signer_seeds],
     )?;
   }
+
+  info!("state transition withdraw success")
 
   Ok(())
 }

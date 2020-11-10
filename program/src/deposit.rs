@@ -95,6 +95,8 @@ fn access_control(req: AccessControlRequest) -> Result<(), FundError> {
     let _ = access_control::check_balance(fund_acc_info, amount)?;
   }
 
+  info!("access control deposit success")
+
   Ok(())
 }
 fn state_transistion(req: StateTransistionRequest) -> Result<(), FundError> {
@@ -114,6 +116,7 @@ fn state_transistion(req: StateTransistionRequest) -> Result<(), FundError> {
 
   {
     if fund_acc.fund_type.eq(&FundType::PublicRaise) {
+      info!("invoke SPL token mint");
       let mint_to_instr = instruction::mint_to(
         &spl_token::ID,
         nft_mint_acc_info.key,
@@ -131,7 +134,6 @@ fn state_transistion(req: StateTransistionRequest) -> Result<(), FundError> {
 
   fund_acc.add(amount);
   // Send tokens from depositor to fund account.
-  info!("SPL token transfer");
   // Now transfer SPL funds from the depositor, to the
   // program-controlled account.
   {
@@ -154,6 +156,10 @@ fn state_transistion(req: StateTransistionRequest) -> Result<(), FundError> {
       ],
       &[],
     )?;
+
+
+    info!("state transition deposit success")
+
 
     Ok(())
   }
