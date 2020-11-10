@@ -1,10 +1,9 @@
 use crate::access_control;
 use fund::{
-  accounts::fund::{Fund, FundType},
+  accounts::{fund::Fund, vault::TokenVault},
   error::{FundError, FundErrorCode},
 };
 use serum_common::pack::Pack;
-use serum_lockup::accounts::token_vault::TokenVault;
 use solana_program::{
   account_info::{next_account_info, AccountInfo},
   info, program,

@@ -1,9 +1,9 @@
 [package]
-name = "fund-program"
-version = "0.1.0"
 authors = ["Marko Baricevic <marbar3778@yahoo.com>"]
-repository = "https://github.com/marbar3778/squad_finance"
 edition = "2018"
+name = "fund-program"
+repository = "https://github.com/marbar3778/squad_finance"
+version = "0.1.0"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -12,24 +12,10 @@ crate-type = ["cdylib", "lib"]
 name = "fund_program"
 
 [features]
-program = ["serum-lockup/program", "solana-sdk/program", "spl-token/program", "spl-token/no-entrypoint"]
-test = ["solana-sdk/default"]
-strict = []
-default = []
+program = ["spl-token/program", "spl-token/no-entrypoint", "fund/program"]
 
 [dependencies]
-solana-program = "1.4.5"
-spl-token = "2.0.8"
-arrayref = "0.3.6"
-num-derive = "0.3"
-num-traits = "0.2"
-num_enum = "0.5.1"
-serde = "1.0.117"
-serde_derive = "1.0.103"
-thiserror = "1.0"
-serum-common = { git = "https://github.com/project-serum/serum-dex" }
-serum-lockup = { git = "https://github.com/project-serum/serum-dex" }
 fund = {path = "../"}
-
-[dev-dependencies]
-solana-sdk = "1.4.4"
+serum-common = {git = "https://github.com/project-serum/serum-dex", features = ["program"]}
+solana-program = {version = "1.4.5", default-features = false}
+spl-token = {version = "2.0.6", default-features = false, features = ["program", "no-entrypoint"]}
