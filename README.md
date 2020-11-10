@@ -1,6 +1,11 @@
+<center>
 # SquFi
 
 > pronounced `sqwa-fy`
+
+![alt text](squfi.png)
+
+</center>
 
 SquFi is a crowd-funding protocol built on [solana](https://solana.com/).
 
@@ -36,4 +41,4 @@ Squfi has multiple types of funds a user can create. All funds have a max that w
 - [x] Create a token to represent pool ownership
 - [ ] Ability to create proposals to withdraw money
 - [ ] Vote on proposals
-- [ ] Rage quit by investors
+- [ ] Rage quit by depositors
