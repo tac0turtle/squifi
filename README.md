@@ -1,7 +1,8 @@
 <center>
+
 # SquFi
 
-> pronounced `sqwa-fy`
+pronounced `sqwa-fy`
 
 ![alt text](squfi.png)
 
