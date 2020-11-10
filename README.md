@@ -4,7 +4,7 @@
 
 pronounced `sqwa-fy`
 
-![alt text](squfi.png)
+![alt text](squfi.jpg)
 
 </div>
 
