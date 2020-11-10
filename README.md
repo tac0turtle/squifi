@@ -1,4 +1,4 @@
-<center>
+<div align="center">
 
 # SquFi
 
@@ -6,7 +6,7 @@ pronounced `sqwa-fy`
 
 ![alt text](squfi.png)
 
-</center>
+</div>
 
 SquFi is a crowd-funding protocol built on [solana](https://solana.com/).
 
