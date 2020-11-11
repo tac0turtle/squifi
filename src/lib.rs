@@ -45,8 +45,6 @@ pub mod instruction {
     /// 2. `[]`         Account to withdraw to
     /// 3. `[]`         Fund Authority
     /// 4. `[]`         SPL token program
-    /// 5. `[writable]` NFT token being redeemed.
-    /// 6. `[writable]` NFT mint to burn the token being redeemed.
     Withdraw { amount: u64 },
   }
 }

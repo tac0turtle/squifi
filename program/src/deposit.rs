@@ -66,10 +66,6 @@ pub fn handler(
 }
 
 fn access_control(req: AccessControlRequest) -> Result<(), FundError> {
-  // 1. correct fund
-  // 2. correct account
-  // 3. if provided deposit_amount + balance < max_balance
-
   let AccessControlRequest {
     program_id,
     amount,
@@ -84,7 +80,10 @@ fn access_control(req: AccessControlRequest) -> Result<(), FundError> {
   }
   {
     // let rent = access_control::rent(rent_acc_info)?;
-    let _ = access_control::fund(fund_acc_info, program_id)?;
+    let fund = access_control::fund(fund_acc_info, program_id)?;
+    if !fund.open {
+      return Err(FundErrorCode::FundClosed)?;
+    }
     let _ = access_control::vault_join(
       vault_acc_info,
       vault_authority_acc_info,
@@ -95,7 +94,7 @@ fn access_control(req: AccessControlRequest) -> Result<(), FundError> {
     let _ = access_control::check_balance(fund_acc_info, amount)?;
   }
 
-  info!("access control deposit success")
+  info!("access control deposit success");
 
   Ok(())
 }
@@ -157,9 +156,7 @@ fn state_transistion(req: StateTransistionRequest) -> Result<(), FundError> {
       &[],
     )?;
 
-
-    info!("state transition deposit success")
-
+    info!("state transition deposit success");
 
     Ok(())
   }

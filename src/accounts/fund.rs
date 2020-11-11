@@ -56,6 +56,10 @@ impl Fund {
       self.shares += amount;
     }
   }
+  /// close_fund is called when the owner starts the withdrawl process
+  pub fn close_fund(&mut self) {
+    self.open = false;
+  }
 }
 
 serum_common::packable!(Fund);

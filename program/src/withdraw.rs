@@ -1,9 +1,6 @@
 use crate::access_control;
 use fund::{
-  accounts::{
-    fund::{Fund, FundType},
-    vault::TokenVault,
-  },
+  accounts::{fund::Fund, vault::TokenVault},
   error::{FundError, FundErrorCode},
 };
 use serum_common::pack::Pack;
@@ -28,8 +25,6 @@ pub fn handler(
   let withdraw_acc_info = next_account_info(acc_infos)?;
   let vault_authority_acc_info = next_account_info(acc_infos)?;
   let token_program_acc_info = next_account_info(acc_infos)?;
-  let nft_mint_acc_info = next_account_info(acc_infos)?;
-  let nft_token_acc_info = next_account_info(acc_infos)?;
 
   access_control(AccessControlRequest {
     program_id,
@@ -44,15 +39,12 @@ pub fn handler(
     &mut fund_acc_info.try_borrow_mut_data()?,
     &mut |fund_acc: &mut Fund| {
       state_transistion(StateTransistionRequest {
-        accounts,
         fund_acc,
         fund_acc_info,
         withdraw_acc_info,
         vault_acc_info,
         vault_authority_acc_info,
         token_program_acc_info,
-        nft_token_acc_info,
-        nft_mint_acc_info,
         amount,
       })
       .map_err(Into::into)
@@ -88,7 +80,7 @@ fn access_control(req: AccessControlRequest) -> Result<(), FundError> {
 
   let _ = access_control::withdraw(program_id, fund_acc_info, withdraw_acc_info);
 
-  info!("access control withdraw success")
+  info!("access control withdraw success");
 
   Ok(())
 }
@@ -96,33 +88,18 @@ fn access_control(req: AccessControlRequest) -> Result<(), FundError> {
 fn state_transistion(req: StateTransistionRequest) -> Result<(), FundError> {
   let StateTransistionRequest {
     fund_acc,
-    accounts,
     fund_acc_info,
     withdraw_acc_info,
     vault_acc_info,
     vault_authority_acc_info,
     token_program_acc_info,
-    nft_mint_acc_info,
-    nft_token_acc_info,
     amount,
   } = req;
 
   {
-    if fund_acc.fund_type.eq(&FundType::PublicRaise) {
-      let burn_instruction = instruction::burn(
-        &spl_token::ID,
-        nft_token_acc_info.key,
-        nft_mint_acc_info.key,
-        &withdraw_acc_info.key,
-        &[],
-        amount,
-      )?;
-      program::invoke_signed(&burn_instruction, &accounts[..], &[])?;
-    }
-  }
-  {
     fund_acc.deduct(amount);
-    // transfer from program account to owner of fund
+    fund_acc.close_fund(); // todo this should be made into a seperate handler and withdraw check if its closed.
+                           // transfer from program account to owner of fund
     info!("invoking token transfer");
     let withdraw_instruction = instruction::transfer(
       &ID,
@@ -147,7 +124,7 @@ fn state_transistion(req: StateTransistionRequest) -> Result<(), FundError> {
     )?;
   }
 
-  info!("state transition withdraw success")
+  info!("state transition withdraw success");
 
   Ok(())
 }
@@ -163,10 +140,7 @@ struct AccessControlRequest<'a, 'b> {
 
 struct StateTransistionRequest<'a, 'b, 'c> {
   fund_acc: &'c mut Fund,
-  accounts: &'a [AccountInfo<'b>],
   fund_acc_info: &'a AccountInfo<'b>,
-  nft_token_acc_info: &'a AccountInfo<'b>,
-  nft_mint_acc_info: &'a AccountInfo<'b>,
   withdraw_acc_info: &'a AccountInfo<'b>,
   vault_acc_info: &'a AccountInfo<'b>,
   vault_authority_acc_info: &'a AccountInfo<'b>,
