@@ -16,7 +16,10 @@ use solana_client::{
     rpc_config::RpcSendTransactionConfig,
 };
 use std::process::exit;
-use spool_fund;
+use fund::{
+  accounts::{fund::FundType},
+  instruction::FundInstruction,
+};
 
 type Error = Box<dyn std::error::Error>;
 
@@ -152,12 +155,11 @@ fn command_create_pool(config: &Config) {
     println!("Creating account {}", pool.pubkey());
     
     let mut new_pool_tx = Transaction::new_with_payer(
-        &[spool_fund::initialize(
-            &spool_fund::id(),
-            &pool.pubkey(),
+        &[FundInstruction::Initialize(
+            config.owner.pubkey(),
             config.owner.pubkey(),
             100, // hard-coded settings
-            spool_fund::Fundme,
+            FundType::FundMe,
         )?], 
         Some(&config.fee_payer.pubkey()),
     );

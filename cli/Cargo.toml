@@ -12,7 +12,7 @@ solana-clap-utils = "1.4.5"
 solana-client = "1.4.5"
 solana-cli-config = "1.4.5"
 solana-sdk = "1.4.5"
-spool-fund = { path="../program" }
+fund = {path = "../"}
 
 [[bin]]
 name = "spool"
