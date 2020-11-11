@@ -1,0 +1,22 @@
+name: Build
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        rversion: ["stable", nightly]
+      fail-fast: true
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: ${{ matrix.rversion }}
+      - uses: actions-rs/cargo@v1
+        with:
+          command: build
+          args: --release --features program

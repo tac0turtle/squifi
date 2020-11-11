@@ -14,12 +14,14 @@ pub use solana_program;
 solana_program::declare_id!("SPQQL11111111111111111111111111111111111111");
 
 pub(crate) mod access_control;
+mod deposit;
 mod initialize;
+mod withdraw;
 
 entrypoint!(process_instruction);
-fn process_instruction<'a>(
-  program_id: &'a Pubkey,
-  accounts: &'a [AccountInfo<'a>],
+fn process_instruction(
+  program_id: &Pubkey,
+  accounts: &[AccountInfo],
   instruction_data: &[u8],
 ) -> ProgramResult {
   info!("process-instruction");
@@ -41,6 +43,8 @@ fn process_instruction<'a>(
       max_balance,
       fund_type,
     ),
+    FundInstruction::Deposit { amount } => deposit::handler(program_id, accounts, amount),
+    FundInstruction::Withdraw { amount } => withdraw::handler(program_id, accounts, amount),
   };
 
   result?;

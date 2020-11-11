@@ -20,6 +20,12 @@ pub enum FundErrorCode {
     InvalidVaultNonce = 4,
     InvalidVault = 5,
     InvalidAccountOwner = 6,
+    AlreadyInitialized = 7,
+    InvalidMint = 8,
+    UnitializedTokenMint = 9,
+    Unauthorized = 10,
+    InvalidRentSysvar = 11,
+    InvalidAccount = 12,
 }
 
 impl std::fmt::Display for FundErrorCode {
