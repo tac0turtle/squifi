@@ -96,7 +96,6 @@ pub fn vault_authority(
   Ok(va)
 }
 
-/// Access control on any instruction mutating an existing Vesting account.
 pub fn withdraw(
   program_id: &Pubkey,
   fund_acc_info: &AccountInfo,
@@ -115,4 +114,14 @@ pub fn withdraw(
   }
 
   Ok(fund)
+}
+
+pub fn check_balance(fund_acc_info: &AccountInfo, amount: u64) -> Result<(), FundError> {
+  let fund = Fund::unpack(&fund_acc_info.try_borrow_data()?)?;
+
+  if fund.balance + amount > fund.max_balance {
+    return Err(FundErrorCode::FundBalanceOverflow)?;
+  }
+
+  Ok(())
 }

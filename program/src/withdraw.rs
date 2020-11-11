@@ -6,11 +6,10 @@ use fund::{
 use serum_common::pack::Pack;
 use solana_program::{
   account_info::{next_account_info, AccountInfo},
-  info,
-  program::invoke_signed,
+  info, program,
   pubkey::Pubkey,
 };
-use spl_token::{instruction::transfer, ID};
+use spl_token::{instruction, ID};
 use std::convert::Into;
 
 pub fn handler(
@@ -58,27 +57,30 @@ pub fn handler(
 fn access_control(req: AccessControlRequest) -> Result<(), FundError> {
   let AccessControlRequest {
     program_id,
-    amount,
+    amount: _,
     fund_acc_info,
     withdraw_acc_info,
     vault_acc_info,
     vault_authority_acc_info,
   } = req;
-  // todo: check balance
 
   if !withdraw_acc_info.is_signer {
     return Err(FundErrorCode::Unauthorized)?;
   }
 
-  let _ = access_control::fund(fund_acc_info, program_id)?;
-  let _ = access_control::vault_join(
-    vault_acc_info,
-    vault_authority_acc_info,
-    fund_acc_info,
-    program_id,
-  )?;
+  {
+    let _ = access_control::fund(fund_acc_info, program_id)?;
+    let _ = access_control::vault_join(
+      vault_acc_info,
+      vault_authority_acc_info,
+      fund_acc_info,
+      program_id,
+    )?;
+  }
 
   let _ = access_control::withdraw(program_id, fund_acc_info, withdraw_acc_info);
+
+  info!("access control withdraw success");
 
   Ok(())
 }
@@ -94,30 +96,35 @@ fn state_transistion(req: StateTransistionRequest) -> Result<(), FundError> {
     amount,
   } = req;
 
-  fund_acc.deduct(amount);
-  // transfer from program account to owner of fund
-  info!("invoking token transfer");
-  let withdraw_instruction = transfer(
-    &ID,
-    vault_acc_info.key,
-    withdraw_acc_info.key,
-    &vault_authority_acc_info.key,
-    &[],
-    amount as u64,
-  )?;
+  {
+    fund_acc.deduct(amount);
+    fund_acc.close_fund(); // todo this should be made into a seperate handler and withdraw check if its closed.
+                           // transfer from program account to owner of fund
+    info!("invoking token transfer");
+    let withdraw_instruction = instruction::transfer(
+      &ID,
+      vault_acc_info.key,
+      withdraw_acc_info.key,
+      &vault_authority_acc_info.key,
+      &[],
+      amount as u64,
+    )?;
 
-  let signer_seeds = TokenVault::signer_seeds(fund_acc_info.key, &fund_acc.nonce);
+    let signer_seeds = TokenVault::signer_seeds(fund_acc_info.key, &fund_acc.nonce);
 
-  invoke_signed(
-    &withdraw_instruction,
-    &[
-      vault_acc_info.clone(),
-      withdraw_acc_info.clone(),
-      vault_authority_acc_info.clone(),
-      token_program_acc_info.clone(),
-    ],
-    &[&signer_seeds],
-  )?;
+    program::invoke_signed(
+      &withdraw_instruction,
+      &[
+        vault_acc_info.clone(),
+        withdraw_acc_info.clone(),
+        vault_authority_acc_info.clone(),
+        token_program_acc_info.clone(),
+      ],
+      &[&signer_seeds],
+    )?;
+  }
+
+  info!("state transition withdraw success");
 
   Ok(())
 }

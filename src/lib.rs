@@ -34,7 +34,9 @@ pub mod instruction {
     /// 2. `[signer]`   Depositor authority
     /// 3. `[]`         Fund
     /// 4. `[]`         Vault Authority
-    /// 4. `[]`         SPL token program
+    /// 5. `[]`         SPL token program
+    /// 6. `[writable]` Token mint representing the investment receipt.
+    /// 7  `[writable]` Token account associated with the mint.
     Deposit { amount: u64 },
     /// Withdraw funds from program account.
     ///
