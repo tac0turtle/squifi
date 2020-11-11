@@ -58,7 +58,9 @@ impl Fund {
   }
   /// close_fund is called when the owner starts the withdrawl process
   pub fn close_fund(&mut self) {
-    self.open = false;
+    if self.open {
+      self.open = false;
+    }
   }
 }
 
