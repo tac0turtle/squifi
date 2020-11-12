@@ -1,16 +1,16 @@
 <div align="center">
 
-# SquFi
+# SquiFi
 
-pronounced `sqwa-fy`
+pronounced `sqwi-fy`
 
-![alt text](squfi.jpg)
+![alt text](squifi.jpg)
 
 </div>
 
-SquFi is a crowd-funding protocol built on [solana](https://solana.com/).
+SquiFi is a crowd-funding protocol built on [solana](https://solana.com/).
 
-Squfi has multiple types of funds a user can create. All funds have a max that when reached depositors will not be able to deposit.
+Squifi has multiple types of funds a user can create. All funds have a max that when reached depositors will not be able to deposit.
 
 - FundMe
   - FundMe is  exactly what it sounds like. A way to fund yourself. There are countless use cases for this type of fund a few are:
@@ -55,8 +55,8 @@ TODO
 - [x] Create funding pool
 - [x] Add tokens to Funding pool
 - [x] Owner of pool withdraw tokens
-- [ ] Add pool contributor paybacks
 - [x] Create a token to represent pool ownership
 - [ ] Ability to create proposals to withdraw money
 - [ ] Vote on proposals
+- [ ] Add pool contributor paybacks
 - [ ] Rage quit by depositors
