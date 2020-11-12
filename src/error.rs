@@ -28,6 +28,7 @@ pub enum FundErrorCode {
     InvalidAccount = 12,
     FundBalanceOverflow = 13,
     FundClosed = 14,
+    FundOpen = 15,
 }
 
 impl std::fmt::Display for FundErrorCode {
