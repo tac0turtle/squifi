@@ -92,6 +92,7 @@ fn access_control(req: AccessControlRequest) -> Result<(), FundError> {
         )?;
 
         let _ = access_control::check_balance(fund_acc_info, amount)?;
+        let _ = access_control::fund_open(fund_acc_info, program_id)?;
     }
 
     info!("access control deposit success");

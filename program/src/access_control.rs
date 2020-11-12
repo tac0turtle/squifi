@@ -47,6 +47,16 @@ pub fn check_owner(
     Ok(())
 }
 
+pub fn fund_open(acc_info: &AccountInfo, program_id: &Pubkey) -> Result<(), FundError> {
+    let fund = fund(acc_info, program_id)?;
+
+    if !fund.open {
+        return Err(FundErrorCode::FundClosed)?;
+    }
+
+    Ok(())
+}
+
 pub fn mint(acc_info: &AccountInfo) -> Result<Mint, FundError> {
     if *acc_info.owner != spl_token::ID {
         return Err(FundErrorCode::InvalidMint)?;
