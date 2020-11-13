@@ -31,6 +31,7 @@ pub fn handler(
     let fund_acc_info = next_account_info(account_info_iter)?;
     let vault_acc_info = next_account_info(account_info_iter)?;
     let mint_acc_info = next_account_info(account_info_iter)?;
+    let whitelist_acc_info = next_account_info(account_info_iter)?;
 
     access_control(AccessControlRequest {
         program_id,
@@ -51,6 +52,7 @@ pub fn handler(
                 authority,
                 mint: mint_acc_info.key,
                 vault: *vault_acc_info.key,
+                whitelist: whitelist_acc_info.key,
                 fund_type,
                 nonce: 0,
                 max_balance,
@@ -117,6 +119,7 @@ fn state_transition(req: StateTransitionRequest) -> Result<(), FundError> {
         fund_type,
         nonce,
         max_balance,
+        whitelist,
     } = req;
 
     fund_acc.initialized = true;
@@ -129,6 +132,10 @@ fn state_transition(req: StateTransitionRequest) -> Result<(), FundError> {
     fund_acc.balance = 0;
     fund_acc.fund_type = fund_type;
     fund_acc.nonce = nonce;
+
+    if fund_type.eq(&FundType::Raise { private: true }) {
+        fund_acc.whitelist = *whitelist;
+    }
 
     info!("state-transition: success");
 
@@ -147,6 +154,7 @@ struct StateTransitionRequest<'a> {
     fund_acc: &'a mut Fund,
     owner: Pubkey,
     mint: &'a Pubkey,
+    whitelist: &'a Pubkey,
     vault: Pubkey,
     authority: Pubkey,
     fund_type: FundType,

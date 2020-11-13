@@ -115,7 +115,9 @@ fn state_transistion(req: StateTransistionRequest) -> Result<(), FundError> {
     } = req;
 
     {
-        if fund_acc.fund_type.eq(&FundType::PublicRaise) {
+        if fund_acc.fund_type.eq(&FundType::Raise {
+            private: true || false,
+        }) {
             info!("invoke SPL token mint");
             let mint_to_instr = instruction::mint_to(
                 &spl_token::ID,

@@ -31,6 +31,9 @@ pub enum FundErrorCode {
     FundOpen = 15,
     WhitelistInvalidData = 16,
     PubKeyAlreadyExists = 17,
+    InvalidWhitelist = 18,
+    WhitelistFull = 19,
+    WhitelistNotFound = 20,
 }
 
 impl std::fmt::Display for FundErrorCode {

@@ -55,9 +55,9 @@ fn access_control(req: AccessControlRequest) -> Result<(), FundError> {
 fn state_transistion(req: StateTransistionRequest) -> Result<(), FundError> {
     let StateTransistionRequest { whitelist, entry } = req;
 
-    whitelist.push(entry)?.ok_or(FundErrorCode::WhitelistFull)?;
-
-    info!("state-transistion: whitelist_add");
+    whitelist
+        .delete(entry)?
+        .ok_or(FundErrorCode::WhitelistNotFound)?;
 
     Ok(())
 }

@@ -1,5 +1,5 @@
 use fund::{
-    accounts::{fund::Fund, vault::TokenVault},
+    accounts::{fund::Fund, vault::TokenVault, whitelist::Whitelist},
     error::{FundError, FundErrorCode},
 };
 use serum_common::pack::Pack;
@@ -33,11 +33,30 @@ pub fn fund(acc_info: &AccountInfo, program_id: &Pubkey) -> Result<Fund, FundErr
     Ok(fund)
 }
 
+pub fn whitelist<'a>(
+    wl_acc_info: AccountInfo<'a>,
+    fund: &Fund,
+    program_id: &Pubkey,
+) -> Result<Whitelist<'a>, FundError> {
+    if program_id != wl_acc_info.owner {
+        return Err(FundErrorCode::InvalidAccountOwner)?;
+    }
+
+    if fund.whitelist != *wl_acc_info.key {
+        return Err(FundErrorCode::InvalidWhitelist)?;
+    }
+    Whitelist::new(wl_acc_info).map_err(Into::into)
+}
+
 pub fn check_owner(
+    program_id: &Pubkey,
     acc_info: &AccountInfo,
     owner_acc_info: &AccountInfo,
-    program_id: &Pubkey,
 ) -> Result<(), FundError> {
+    if !owner_acc_info.is_signer {
+        return Err(FundErrorCode::Unauthorized)?;
+    }
+
     let fund = fund(acc_info, program_id)?;
 
     if !fund.owner.eq(owner_acc_info.key) {
