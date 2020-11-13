@@ -110,13 +110,13 @@ fn access_control(req: AccessControlRequest) -> Result<(), FundError> {
     if fund.fund_type.eq(&FundType::Raise {
         private: true || false,
     }) {
-        let mint = access_control::mint(nft_mint_acc_info.unwrap())?;
+        let nft_mint = access_control::mint(nft_mint_acc_info.unwrap())?;
         let fund_authority = Pubkey::create_program_address(
             &TokenVault::signer_seeds(&fund_acc_info.key, &fund.nonce),
             program_id,
         )
         .map_err(|_| FundErrorCode::InvalidVaultNonce)?;
-        if mint.mint_authority != COption::Some(fund_authority) {
+        if nft_mint.mint_authority != COption::Some(fund_authority) {
             return Err(FundErrorCode::InvalidMintAuthority)?;
         }
     }
