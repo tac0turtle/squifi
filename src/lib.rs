@@ -16,7 +16,7 @@ pub mod instruction {
         /// 1. `[writable]` Fund to create
         /// 2. `[writable]` Program controlled tokenvault.
         /// 3. `[]`         Mint
-        /// 4. `[]` todo add rent sysvar
+        /// 4. `[]`         rent sysvar
         Initialize {
             /// Owner of the Fund
             owner: Pubkey,
@@ -46,11 +46,16 @@ pub mod instruction {
         /// 3. `[]`         Fund Authority
         /// 4. `[]`         SPL token program
         Withdraw { amount: u64 },
-        /// Withdraw funds from program account.
+        /// Close fund, prohibit deposits
         ///
         /// 0. `[writable]` Fund
         /// 2. `[signer]`   FundOwner
         Close,
+        /// Add to Whitelist of fund.
+        ///
+        /// 0. `[writable]` Fund
+        /// 2. `[signer]`   FundOwner
+        WhitelistAdd { accounts: Pubkey },
     }
 }
 

@@ -10,6 +10,7 @@ version = "0.1.0"
 program = ["solana-client-gen/program", "spl-token/program", "serum-common/program"]
 
 [dependencies]
+arrayref = "0.3.6"
 bytemuck = "1.4.1"
 num_enum = "0.5.0"
 serde = {version = "1.0", features = ["derive"]}
