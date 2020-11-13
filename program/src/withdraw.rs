@@ -57,7 +57,7 @@ pub fn handler(
 fn access_control(req: AccessControlRequest) -> Result<(), FundError> {
     let AccessControlRequest {
         program_id,
-        amount: _,
+        amount,
         fund_acc_info,
         withdraw_acc_info,
         vault_acc_info,
@@ -70,6 +70,9 @@ fn access_control(req: AccessControlRequest) -> Result<(), FundError> {
 
     {
         let fund = access_control::fund(fund_acc_info, program_id)?;
+        if (fund.balance - amount) < fund.balance {
+            return Err(FundErrorCode::FundBalanceOverflow)?;
+        }
         let _ = access_control::vault_join(
             vault_acc_info,
             vault_authority_acc_info,

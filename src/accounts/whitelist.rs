@@ -78,7 +78,7 @@ impl<'a> Whitelist<'a> {
         Ok(idx)
     }
 
-    fn index_of(&self, e: &Pubkey) -> Result<Option<usize>, FundError> {
+    pub fn index_of(&self, e: &Pubkey) -> Result<Option<usize>, FundError> {
         for k in (0..Whitelist::SIZE).step_by(Whitelist::ITEM_SIZE) {
             let curr_idx = k / Whitelist::ITEM_SIZE;
             let entry = &self.get_at(curr_idx)?;

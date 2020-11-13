@@ -13,6 +13,7 @@ use serum_common::pack::Pack;
 use solana_program::{
     account_info::{next_account_info, AccountInfo},
     info,
+    program_option::COption,
     pubkey::Pubkey,
 };
 use std::convert::Into;
@@ -27,17 +28,21 @@ pub fn handler(
 ) -> Result<(), FundError> {
     info!("Initialize Fund");
 
-    let account_info_iter = &mut accounts.iter();
-    let fund_acc_info = next_account_info(account_info_iter)?;
-    let vault_acc_info = next_account_info(account_info_iter)?;
-    let mint_acc_info = next_account_info(account_info_iter)?;
-    let whitelist_acc_info = next_account_info(account_info_iter)?;
+    let acc_infos = &mut accounts.iter();
+    let fund_acc_info = next_account_info(acc_infos)?;
+    let vault_acc_info = next_account_info(acc_infos)?;
+    let mint_acc_info = next_account_info(acc_infos)?;
+    let whitelist_acc_info = next_account_info(acc_infos)?;
+    let nft_token_acc_info = acc_infos.next();
+    let nft_mint_acc_info = acc_infos.next();
 
     access_control(AccessControlRequest {
         program_id,
         fund_acc_info,
         mint_acc_info,
         vault_acc_info,
+        nft_mint_acc_info,
+        nft_token_acc_info,
         nonce: 0,
     })?;
 
@@ -51,6 +56,8 @@ pub fn handler(
                 owner,
                 authority,
                 mint: mint_acc_info.key,
+                nft_mint_acc_info,
+                nft_token_acc_info,
                 vault: *vault_acc_info.key,
                 whitelist: whitelist_acc_info.key,
                 fund_type,
@@ -71,16 +78,17 @@ fn access_control(req: AccessControlRequest) -> Result<(), FundError> {
         program_id,
         fund_acc_info,
         mint_acc_info,
+        nft_token_acc_info,
+        nft_mint_acc_info,
         vault_acc_info,
         nonce,
     } = req;
 
+    let fund = Fund::unpack(&fund_acc_info.try_borrow_data()?)?;
     {
-        let fund = Fund::unpack(&fund_acc_info.try_borrow_data()?)?;
         if fund_acc_info.owner != program_id {
             return Err(FundErrorCode::NotOwnedByProgram)?;
         }
-        // todo check rent exempt
         if fund.initialized {
             return Err(FundErrorCode::AlreadyInitialized)?;
         }
@@ -97,6 +105,20 @@ fn access_control(req: AccessControlRequest) -> Result<(), FundError> {
             return Err(FundErrorCode::InvalidVault)?;
         }
         // todo check for rent exmpt
+    }
+
+    if fund.fund_type.eq(&FundType::Raise {
+        private: true || false,
+    }) {
+        let mint = access_control::mint(nft_mint_acc_info.unwrap())?;
+        let fund_authority = Pubkey::create_program_address(
+            &TokenVault::signer_seeds(&fund_acc_info.key, &fund.nonce),
+            program_id,
+        )
+        .map_err(|_| FundErrorCode::InvalidVaultNonce)?;
+        if mint.mint_authority != COption::Some(fund_authority) {
+            return Err(FundErrorCode::InvalidMintAuthority)?;
+        }
     }
 
     // Mint (initialized but not yet on Safe).
@@ -116,6 +138,8 @@ fn state_transition(req: StateTransitionRequest) -> Result<(), FundError> {
         authority,
         vault,
         mint,
+        nft_mint_acc_info,
+        nft_token_acc_info,
         fund_type,
         nonce,
         max_balance,
@@ -133,6 +157,12 @@ fn state_transition(req: StateTransitionRequest) -> Result<(), FundError> {
     fund_acc.fund_type = fund_type;
     fund_acc.nonce = nonce;
 
+    if fund_type.eq(&FundType::Raise {
+        private: true || false,
+    }) {
+        fund_acc.nft_mint = nft_mint_acc_info.unwrap().key.clone();
+        fund_acc.nft_account = nft_token_acc_info.unwrap().key.clone();
+    }
     if fund_type.eq(&FundType::Raise { private: true }) {
         fund_acc.whitelist = *whitelist;
     }
@@ -146,15 +176,19 @@ struct AccessControlRequest<'a, 'b> {
     program_id: &'a Pubkey,
     fund_acc_info: &'a AccountInfo<'b>,
     mint_acc_info: &'a AccountInfo<'b>,
+    nft_mint_acc_info: Option<&'a AccountInfo<'b>>,
+    nft_token_acc_info: Option<&'a AccountInfo<'b>>,
     vault_acc_info: &'a AccountInfo<'b>,
     nonce: u8,
 }
 
-struct StateTransitionRequest<'a> {
+struct StateTransitionRequest<'a, 'b> {
     fund_acc: &'a mut Fund,
     owner: Pubkey,
     mint: &'a Pubkey,
     whitelist: &'a Pubkey,
+    nft_token_acc_info: Option<&'a AccountInfo<'b>>,
+    nft_mint_acc_info: Option<&'a AccountInfo<'b>>,
     vault: Pubkey,
     authority: Pubkey,
     fund_type: FundType,
