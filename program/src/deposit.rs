@@ -118,6 +118,10 @@ fn state_transistion(req: StateTransistionRequest) -> Result<(), FundError> {
         if fund_acc.fund_type.eq(&FundType::Raise {
             private: true || false,
         }) {
+            if fund_acc.shares == 0 {
+                fund_acc.nft_account = nft_token_acc_info.key.clone();
+                fund_acc.nft_mint = nft_mint_acc_info.key.clone();
+            }
             info!("invoke SPL token mint");
             let mint_to_instr = instruction::mint_to(
                 &spl_token::ID,
