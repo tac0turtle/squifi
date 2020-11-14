@@ -3,7 +3,10 @@ use fund::{
     error::{FundError, FundErrorCode},
 };
 use serum_common::pack::Pack;
-use solana_program::{account_info::AccountInfo, program_pack::Pack as TokenPack, pubkey::Pubkey};
+use solana_program::sysvar::Sysvar;
+use solana_program::{
+    account_info::AccountInfo, program_pack::Pack as TokenPack, pubkey::Pubkey, sysvar::rent::Rent,
+};
 
 use spl_token::state::{Account as TokenAccount, Mint};
 
@@ -87,6 +90,13 @@ pub fn mint(acc_info: &AccountInfo) -> Result<Mint, FundError> {
     }
 
     Ok(mint)
+}
+
+pub fn rent(acc_info: &AccountInfo) -> Result<Rent, FundError> {
+    if *acc_info.key != solana_program::sysvar::rent::id() {
+        return Err(FundErrorCode::InvalidRentSysvar)?;
+    }
+    Rent::from_account_info(acc_info).map_err(Into::into)
 }
 
 pub fn vault(acc_info: &AccountInfo, fund: &Fund) -> Result<TokenAccount, FundError> {

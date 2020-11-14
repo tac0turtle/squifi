@@ -32,6 +32,9 @@ pub fn handler(
     let fund_acc_info = next_account_info(acc_infos)?;
     let vault_acc_info = next_account_info(acc_infos)?;
     let mint_acc_info = next_account_info(acc_infos)?;
+    let rent_acc_info = next_account_info(acc_infos)?;
+
+    // Optional accounts
     let whitelist_acc_info = acc_infos.next();
     let nft_token_acc_info = acc_infos.next();
     let nft_mint_acc_info = acc_infos.next();
@@ -41,6 +44,7 @@ pub fn handler(
         fund_acc_info,
         mint_acc_info,
         vault_acc_info,
+        rent_acc_info,
         nft_mint_acc_info,
         nft_token_acc_info,
         nonce: 0,
@@ -78,16 +82,22 @@ fn access_control(req: AccessControlRequest) -> Result<(), FundError> {
         program_id,
         fund_acc_info,
         mint_acc_info,
+        rent_acc_info,
         nft_token_acc_info,
         nft_mint_acc_info,
         vault_acc_info,
         nonce,
     } = req;
 
+    let rent = access_control::rent(rent_acc_info)?;
+
     let fund = Fund::unpack(&fund_acc_info.try_borrow_data()?)?;
     {
         if fund_acc_info.owner != program_id {
             return Err(FundErrorCode::NotOwnedByProgram)?;
+        }
+        if !rent.is_exempt(fund_acc_info.lamports(), fund_acc_info.try_data_len()?) {
+            return Err(FundErrorCode::NotRentExempt)?;
         }
         if fund.initialized {
             return Err(FundErrorCode::AlreadyInitialized)?;
@@ -176,6 +186,7 @@ struct AccessControlRequest<'a, 'b> {
     program_id: &'a Pubkey,
     fund_acc_info: &'a AccountInfo<'b>,
     mint_acc_info: &'a AccountInfo<'b>,
+    rent_acc_info: &'a AccountInfo<'b>,
     nft_mint_acc_info: Option<&'a AccountInfo<'b>>,
     nft_token_acc_info: Option<&'a AccountInfo<'b>>,
     vault_acc_info: &'a AccountInfo<'b>,
