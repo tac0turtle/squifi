@@ -20,11 +20,11 @@ pub fn handler(
     info!("Handler: payback_init");
     let acc_infos = &mut accounts.iter();
 
-    let payback_vault_acc_info = next_account_info(acc_infos)?;
-    let fund_acc_info = next_account_info(acc_infos)?;
     let depositor_acc_info = next_account_info(acc_infos)?;
     let depositor_authority_acc_info = next_account_info(acc_infos)?;
     let token_program_acc_info = next_account_info(acc_infos)?;
+    let payback_vault_acc_info = next_account_info(acc_infos)?;
+    let fund_acc_info = next_account_info(acc_infos)?;
 
     access_control(AccessControlRequest {
         program_id,

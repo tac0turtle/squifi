@@ -85,12 +85,11 @@ pub mod instruction {
         PaybackWithdraw { amount: u64 },
         /// PayBack Deposit allows the fund owner to deposit more into the payback vault.
         ///
-        /// 0. `[]`         SPL Token program
-        /// 1. `[]`         Fund SPL NFT program
-        /// 2. `[]`         Payback Vault Authority
-        /// 4. `[writable]` Payback Vault
-        /// 3. `[writable]` Fund
-        /// 5. `[]`         Withdraw Account
+        /// 0. `[writable]` Depositor token account.
+        /// 1. `[signer]`   Depositor auhtority.
+        /// 2. `[]`         SPL Token program
+        /// 5. `[writable]` Payback Vault
+        /// 6. `[writable]` Fund
         PaybackDeposit { amount: u64 },
     }
 }
