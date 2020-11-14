@@ -1,5 +1,5 @@
 use fund::{
-    accounts::{fund::Fund, vault::TokenVault},
+    accounts::{fund::Fund, vault::TokenVault, whitelist::Whitelist},
     error::{FundError, FundErrorCode},
 };
 use serum_common::pack::Pack;
@@ -33,11 +33,30 @@ pub fn fund(acc_info: &AccountInfo, program_id: &Pubkey) -> Result<Fund, FundErr
     Ok(fund)
 }
 
+pub fn whitelist<'a>(
+    wl_acc_info: AccountInfo<'a>,
+    fund: &Fund,
+    program_id: &Pubkey,
+) -> Result<Whitelist<'a>, FundError> {
+    if program_id != wl_acc_info.owner {
+        return Err(FundErrorCode::InvalidAccountOwner)?;
+    }
+
+    if fund.whitelist != *wl_acc_info.key {
+        return Err(FundErrorCode::InvalidWhitelist)?;
+    }
+    Whitelist::new(wl_acc_info).map_err(Into::into)
+}
+
 pub fn check_owner(
+    program_id: &Pubkey,
     acc_info: &AccountInfo,
     owner_acc_info: &AccountInfo,
-    program_id: &Pubkey,
 ) -> Result<(), FundError> {
+    if !owner_acc_info.is_signer {
+        return Err(FundErrorCode::Unauthorized)?;
+    }
+
     let fund = fund(acc_info, program_id)?;
 
     if !fund.owner.eq(owner_acc_info.key) {
@@ -61,6 +80,7 @@ pub fn mint(acc_info: &AccountInfo) -> Result<Mint, FundError> {
     if *acc_info.owner != spl_token::ID {
         return Err(FundErrorCode::InvalidMint)?;
     }
+
     let mint = Mint::unpack(&acc_info.try_borrow_data()?)?;
     if !mint.is_initialized {
         return Err(FundErrorCode::UnitializedTokenMint)?;
@@ -147,5 +167,41 @@ pub fn check_balance(fund_acc_info: &AccountInfo, amount: u64) -> Result<(), Fun
         return Err(FundErrorCode::FundBalanceOverflow)?;
     }
 
+    Ok(())
+}
+
+pub fn check_depositor<'a>(
+    program_id: &Pubkey,
+    wl_acc_info: AccountInfo<'a>,
+    fund: &Fund,
+    depositor_acc_info: &AccountInfo<'a>,
+) -> Result<(), FundError> {
+    if program_id != wl_acc_info.owner {
+        return Err(FundErrorCode::InvalidAccountOwner)?;
+    }
+
+    if fund.whitelist != *wl_acc_info.key {
+        return Err(FundErrorCode::InvalidWhitelist)?;
+    }
+
+    let wl: Result<Whitelist, FundError> = Whitelist::new(wl_acc_info).map_err(Into::into);
+
+    let _ = wl.unwrap().index_of(depositor_acc_info.key)?;
+
+    Ok(())
+}
+
+pub fn check_nft<'a>(
+    fund: &Fund,
+    mint_acc_info: &AccountInfo<'a>,
+    token_acc_info: &AccountInfo<'a>,
+) -> Result<(), FundError> {
+    let token_acc = token(token_acc_info)?;
+    if token_acc.mint != fund.nft_mint {
+        return Err(FundErrorCode::InvalidTokenAccountMint)?;
+    }
+    if token_acc.mint != *mint_acc_info.key {
+        return Err(FundErrorCode::InvalidMint)?;
+    }
     Ok(())
 }

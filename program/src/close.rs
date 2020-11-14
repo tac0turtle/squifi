@@ -1,8 +1,5 @@
 use crate::access_control;
-use fund::{
-    accounts::fund::Fund,
-    error::{FundError, FundErrorCode},
-};
+use fund::{accounts::fund::Fund, error::FundError};
 use serum_common::pack::Pack;
 use solana_program::{
     account_info::{next_account_info, AccountInfo},
@@ -40,11 +37,7 @@ fn access_control(req: AccessControlRequest) -> Result<(), FundError> {
         fund_owner_acc_info,
     } = req;
 
-    if !fund_owner_acc_info.is_signer {
-        return Err(FundErrorCode::Unauthorized)?;
-    }
-
-    let _ = access_control::check_owner(fund_acc_info, fund_owner_acc_info, program_id)?;
+    let _ = access_control::check_owner(program_id, fund_acc_info, fund_owner_acc_info)?;
 
     info!("access control close success");
 

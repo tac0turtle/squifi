@@ -13,6 +13,8 @@ pub(crate) mod access_control;
 mod close;
 mod deposit;
 mod initialize;
+mod whitelist_add;
+mod whitelist_delete;
 mod withdraw;
 
 entrypoint!(process_instruction);
@@ -43,6 +45,12 @@ fn process_instruction(
         FundInstruction::Deposit { amount } => deposit::handler(program_id, accounts, amount),
         FundInstruction::Withdraw { amount } => withdraw::handler(program_id, accounts, amount),
         FundInstruction::Close => close::handler(program_id, accounts),
+        FundInstruction::WhitelistAdd { entry } => {
+            whitelist_add::handler(program_id, accounts, entry)
+        }
+        FundInstruction::WhitelistDelete { entry } => {
+            whitelist_delete::handler(program_id, accounts, entry)
+        }
     };
 
     result?;
