@@ -69,7 +69,7 @@ pub mod instruction {
         /// InitilaizePayback creates a program address to pay back token holders
         ///
         /// 0. `[writable]` Payback Tokenvault (new).
-        /// 1. `[writable]` Fund to transfer tokens out of
+        /// 1. `[writable]` Fund
         /// 2. `[writable]` Depositor token account.
         /// 3. `[signer]`   Depositor auhtority.
         /// 5. `[]`         Token Program Account
@@ -79,9 +79,10 @@ pub mod instruction {
         /// 0. `[]`         SPL Token program
         /// 1. `[]`         Fund SPL NFT program
         /// 2. `[]`         Payback Vault Authority
-        /// 4. `[writable]` Payback Vault
-        /// 3. `[writable]` Fund
+        /// 3. `[writable]` Payback Vault
+        /// 4. `[writable]` Fund
         /// 5. `[]`         Withdraw Account
+        /// 6. `[]`         NFT Token Account
         PaybackWithdraw { amount: u64 },
         /// PayBack Deposit allows the fund owner to deposit more into the payback vault.
         ///
