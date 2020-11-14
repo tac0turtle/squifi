@@ -26,6 +26,19 @@ pub enum FundErrorCode {
     Unauthorized = 10,
     InvalidRentSysvar = 11,
     InvalidAccount = 12,
+    FundBalanceOverflow = 13,
+    FundClosed = 14,
+    FundOpen = 15,
+    WhitelistInvalidData = 16,
+    PubKeyAlreadyExists = 17,
+    InvalidWhitelist = 18,
+    WhitelistFull = 19,
+    WhitelistNotFound = 20,
+    NFTMintMissing = 21,
+    NFTTokenAccountMissing = 22,
+    InvalidMintAuthority = 23,
+    InvalidTokenAccountMint = 24,
+    NotRentExempt = 25,
 }
 
 impl std::fmt::Display for FundErrorCode {
