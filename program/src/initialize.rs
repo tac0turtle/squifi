@@ -32,7 +32,7 @@ pub fn handler(
     let fund_acc_info = next_account_info(acc_infos)?;
     let vault_acc_info = next_account_info(acc_infos)?;
     let mint_acc_info = next_account_info(acc_infos)?;
-    let whitelist_acc_info = next_account_info(acc_infos)?;
+    let whitelist_acc_info = acc_infos.next();
     let nft_token_acc_info = acc_infos.next();
     let nft_mint_acc_info = acc_infos.next();
 
@@ -59,7 +59,7 @@ pub fn handler(
                 nft_mint_acc_info,
                 nft_token_acc_info,
                 vault: *vault_acc_info.key,
-                whitelist: whitelist_acc_info.key,
+                whitelist_acc_info,
                 fund_type,
                 nonce: 0,
                 max_balance,
@@ -143,7 +143,7 @@ fn state_transition(req: StateTransitionRequest) -> Result<(), FundError> {
         fund_type,
         nonce,
         max_balance,
-        whitelist,
+        whitelist_acc_info,
     } = req;
 
     fund_acc.initialized = true;
@@ -164,7 +164,7 @@ fn state_transition(req: StateTransitionRequest) -> Result<(), FundError> {
         fund_acc.nft_account = nft_token_acc_info.unwrap().key.clone();
     }
     if fund_type.eq(&FundType::Raise { private: true }) {
-        fund_acc.whitelist = *whitelist;
+        fund_acc.whitelist = *whitelist_acc_info.unwrap().key;
     }
 
     info!("state-transition: success");
@@ -186,7 +186,7 @@ struct StateTransitionRequest<'a, 'b> {
     fund_acc: &'a mut Fund,
     owner: Pubkey,
     mint: &'a Pubkey,
-    whitelist: &'a Pubkey,
+    whitelist_acc_info: Option<&'a AccountInfo<'b>>,
     nft_token_acc_info: Option<&'a AccountInfo<'b>>,
     nft_mint_acc_info: Option<&'a AccountInfo<'b>>,
     vault: Pubkey,
