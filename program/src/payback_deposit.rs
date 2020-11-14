@@ -72,7 +72,7 @@ fn access_control(req: AccessControlRequest) -> Result<(), FundError> {
 
     let _ = access_control::withdraw(program_id, fund_acc_info, depositor_acc_info);
 
-    let _ = access_control::vault(
+    let _ = access_control::payback_vault(
         payback_vault_authority_acc_info,
         payback_vault_acc_info,
         fund_acc_info,

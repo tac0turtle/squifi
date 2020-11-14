@@ -128,6 +128,35 @@ pub fn vault(
     Ok(vault)
 }
 
+pub fn payback_vault(
+    acc_info: &AccountInfo,
+    vault_authority_acc_info: &AccountInfo,
+    fund_acc_info: &AccountInfo,
+    program_id: &Pubkey,
+) -> Result<TokenAccount, FundError> {
+    let fund = fund(fund_acc_info, program_id)?;
+    let vault = token(acc_info)?;
+    if *acc_info.key != fund.payback_vault {
+        return Err(FundErrorCode::InvalidVault)?;
+    }
+
+    let va = vault_authority(
+        vault_authority_acc_info,
+        fund_acc_info.key,
+        &fund,
+        program_id,
+    )?;
+
+    if va != vault.owner {
+        return Err(FundErrorCode::InvalidVault)?;
+    }
+    if va != *vault_authority_acc_info.key {
+        return Err(FundErrorCode::InvalidVault)?;
+    }
+
+    Ok(vault)
+}
+
 pub fn vault_join(
     acc_info: &AccountInfo,
     vault_authority_acc_info: &AccountInfo,
