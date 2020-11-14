@@ -4,22 +4,8 @@ use solana_clap_utils::{
     input_validators::{is_keypair, is_pubkey},
     keypair::signer_from_path,
 };
-use solana_sdk::{
-    commitment_config::CommitmentConfig,
-    native_token::lamports_to_sol,
-    signature::{Keypair, Signer, Signature},
-    pubkey::Pubkey,
-    transaction::Transaction,
-};
-use solana_client::{
-    rpc_client::RpcClient,
-    rpc_config::RpcSendTransactionConfig,
-};
 use std::process::exit;
-use fund::{
-  accounts::{fund::FundType},
-  instruction::FundInstruction,
-};
+use fund::accounts::{fund::FundType};
 use client::{create_fund, check_balance};
 
 type Error = Box<dyn std::error::Error>;
