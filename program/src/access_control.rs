@@ -99,11 +99,32 @@ pub fn rent(acc_info: &AccountInfo) -> Result<Rent, FundError> {
     Rent::from_account_info(acc_info).map_err(Into::into)
 }
 
-pub fn vault(acc_info: &AccountInfo, fund: &Fund) -> Result<TokenAccount, FundError> {
+pub fn vault(
+    acc_info: &AccountInfo,
+    vault_authority_acc_info: &AccountInfo,
+    fund_acc_info: &AccountInfo,
+    program_id: &Pubkey,
+) -> Result<TokenAccount, FundError> {
+    let fund = fund(fund_acc_info, program_id)?;
     let vault = token(acc_info)?;
     if *acc_info.key != fund.vault {
         return Err(FundErrorCode::InvalidVault)?;
     }
+
+    let va = vault_authority(
+        vault_authority_acc_info,
+        fund_acc_info.key,
+        &fund,
+        program_id,
+    )?;
+
+    if va != vault.owner {
+        return Err(FundErrorCode::InvalidVault)?;
+    }
+    if va != *vault_authority_acc_info.key {
+        return Err(FundErrorCode::InvalidVault)?;
+    }
+
     Ok(vault)
 }
 
@@ -114,7 +135,12 @@ pub fn vault_join(
     program_id: &Pubkey,
 ) -> Result<TokenAccount, FundError> {
     let fund = fund(fund_acc_info, program_id)?;
-    let vault = vault(acc_info, &fund)?;
+    let vault = vault(
+        acc_info,
+        vault_authority_acc_info,
+        fund_acc_info,
+        program_id,
+    )?;
     let va = vault_authority(
         vault_authority_acc_info,
         fund_acc_info.key,

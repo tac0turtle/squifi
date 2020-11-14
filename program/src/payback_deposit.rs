@@ -24,6 +24,7 @@ pub fn handler(
     let depositor_authority_acc_info = next_account_info(acc_infos)?;
     let token_program_acc_info = next_account_info(acc_infos)?;
     let payback_vault_acc_info = next_account_info(acc_infos)?;
+    let payback_vault_authority_acc_info = next_account_info(acc_infos)?;
     let fund_acc_info = next_account_info(acc_infos)?;
 
     access_control(AccessControlRequest {
@@ -31,6 +32,8 @@ pub fn handler(
         fund_acc_info,
         depositor_acc_info,
         depositor_authority_acc_info,
+        payback_vault_acc_info,
+        payback_vault_authority_acc_info,
     })?;
 
     Fund::unpack_mut(
@@ -57,6 +60,8 @@ fn access_control(req: AccessControlRequest) -> Result<(), FundError> {
         fund_acc_info,
         depositor_acc_info,
         depositor_authority_acc_info,
+        payback_vault_authority_acc_info,
+        payback_vault_acc_info,
     } = req;
 
     if !depositor_authority_acc_info.is_signer {
@@ -66,6 +71,13 @@ fn access_control(req: AccessControlRequest) -> Result<(), FundError> {
     let _ = access_control::fund(fund_acc_info, program_id)?;
 
     let _ = access_control::withdraw(program_id, fund_acc_info, depositor_acc_info);
+
+    let _ = access_control::vault(
+        payback_vault_authority_acc_info,
+        payback_vault_acc_info,
+        fund_acc_info,
+        program_id,
+    )?;
 
     Ok(())
 }
@@ -115,6 +127,8 @@ fn state_transistion(req: StateTransistionRequest) -> Result<(), FundError> {
 struct AccessControlRequest<'a, 'b> {
     program_id: &'a Pubkey,
     fund_acc_info: &'a AccountInfo<'b>,
+    payback_vault_acc_info: &'a AccountInfo<'b>,
+    payback_vault_authority_acc_info: &'a AccountInfo<'b>,
     depositor_acc_info: &'a AccountInfo<'b>,
     depositor_authority_acc_info: &'a AccountInfo<'b>,
 }
