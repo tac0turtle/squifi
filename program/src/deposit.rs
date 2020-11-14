@@ -101,7 +101,7 @@ fn access_control(req: AccessControlRequest) -> Result<(), FundError> {
         let _ = access_control::fund_open(fund_acc_info, program_id)?;
         // check if the despoitor is part of the whitelist.
         if fund.fund_type.eq(&FundType::Raise {
-            private: true || false,
+            private: (true || false),
         }) {
             let _ = access_control::check_nft(
                 &fund,
@@ -147,7 +147,7 @@ fn state_transistion(req: StateTransistionRequest) -> Result<(), FundError> {
 
     {
         if fund_acc.fund_type.eq(&FundType::Raise {
-            private: true || false,
+            private: (true || false),
         }) {
             info!("invoke SPL token mint");
             let mint_to_instr = instruction::mint_to(

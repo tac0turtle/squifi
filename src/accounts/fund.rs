@@ -57,7 +57,7 @@ impl Fund {
     pub fn add(&mut self, amount: u64) {
         self.balance += amount;
         if self.fund_type.eq(&FundType::Raise {
-            private: false || true,
+            private: (true || false),
         }) {
             self.shares += amount;
         }

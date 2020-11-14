@@ -29,7 +29,7 @@ impl<'a> Whitelist<'a> {
 
     pub fn new(acc_info: AccountInfo<'a>) -> Result<Self, FundError> {
         if acc_info.try_data_len()? != Whitelist::SIZE {
-            return Err(FundErrorCode::WhitelistInvalidData)?;
+            return Err(FundErrorCode::WhitelistInvalidData.into());
         }
         Ok(Self { acc_info })
     }
@@ -55,8 +55,8 @@ impl<'a> Whitelist<'a> {
     /// is full, returns None.
     pub fn push(&self, entry: Pubkey) -> Result<Option<usize>, FundError> {
         let existing_idx = self.index_of(&entry)?;
-        if let Some(_) = existing_idx {
-            return Err(FundErrorCode::PubKeyAlreadyExists)?;
+        if existing_idx.is_some() {
+            return Err(FundErrorCode::PubKeyAlreadyExists.into());
         }
         let pk = Pubkey::new_from_array([0; 32]);
         let idx = self.index_of(&pk)?;
