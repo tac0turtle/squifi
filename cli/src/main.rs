@@ -24,8 +24,10 @@ use client::{create_fund, check_balance};
 
 type Error = Box<dyn std::error::Error>;
 
+const DEFAULT_MAX_BALANCE: u64 = 1000;
+
 struct Config {
-    rpc: RpcClient,
+    rpc_client: RpcClient,
     pool: Pubkey,
     owner: Box<dyn Signer>,
     fee_payer: Box<dyn Signer>,
@@ -140,8 +142,15 @@ fn main() {
     };
     
     let _ = match matches.subcommand() {
-        ("init", Some(_arg_matches)) => {
-            create_fund(&config)
+        ("create", Some(_arg_matches)) => {
+            // should save account to the config
+            let account = create_fund(
+                &config.rpc_client, 
+                &config.owner.pubkey(), 
+                config.fee_payer, 
+                DEFAULT_MAX_BALANCE,
+                FundType::FundMe,
+            );
         }
         ("balance", Some(arg_matches)) => {
             let pool = pubkey_of(arg_matches, "pool").unwrap();

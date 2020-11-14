@@ -6,7 +6,7 @@ use solana_sdk::{
 use solana_client::{
     rpc_client::RpcClient,
 };
-use serum_common::client::rpc::{create_account_rent_exempt, send_txn};
+use serum_common::client::rpc;
 use fund::{
   accounts::{fund::FundType},
   instruction::FundInstruction,
@@ -21,16 +21,16 @@ lazy_static::lazy_static! {
 
 pub fn create_fund(
     client: &RpcClient, 
-    owner: &PubKey, 
+    owner: &Pubkey, 
     payer: &Keypair, 
     max_balance: u64,
-    fund_type: FundType
+    fund_type: FundType,
 ) -> Result<Keypair> {
-    let account = create_account_rent_exempt(client, payer, SIZE, owner);
+    let account = serum_common::client::rpc::create_account_rent_exempt(client, payer, SIZE, owner);
 
     let signers = vec![payer, &account];
     
-    let create_func_instruction = FundInstruction::Initialize(
+    let create_fund_instruction = FundInstruction::Initialize(
         &owner,
         &account.pubkey(),
         max_balance,
@@ -40,13 +40,13 @@ pub fn create_fund(
     let (recent_hash, _fee_calc) = client.get_recent_blockhash()?;
 
     let txn = Transaction::new_signed_with_payer(
-        &[create_func_instructions],
+        &[create_fund_instruction],
         Some(&payer.pubkey()),
         &signers,
         recent_hash,
     );
     
-    send_txn(client, &txn, false)?;
+    serum_common::client::rpc::send_txn(client, &txn, false)?;
     Ok(account)
 }
 
