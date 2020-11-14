@@ -45,6 +45,8 @@ pub struct Fund {
     pub nft_mint: Pubkey,
     /// whitelist represents a list of pubkeys that can deposit into a fund
     pub whitelist: Pubkey,
+    /// payback token vault
+    pub payback_vault: Pubkey,
 }
 
 impl Fund {

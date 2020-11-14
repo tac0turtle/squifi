@@ -189,11 +189,10 @@ fn state_transistion(req: StateTransistionRequest) -> Result<(), FundError> {
             ],
             &[],
         )?;
-
-        info!("state transition deposit success");
-
-        Ok(())
     }
+    info!("state transition deposit success");
+
+    Ok(())
 }
 
 struct AccessControlRequest<'a, 'b> {

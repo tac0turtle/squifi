@@ -12,6 +12,7 @@ use solana_program::{
 pub(crate) mod access_control;
 mod close;
 mod deposit;
+mod init_payback;
 mod initialize;
 mod whitelist_add;
 mod whitelist_delete;
@@ -50,6 +51,9 @@ fn process_instruction(
         }
         FundInstruction::WhitelistDelete { entry } => {
             whitelist_delete::handler(program_id, accounts, entry)
+        }
+        FundInstruction::InitializePayback { amount } => {
+            init_payback::handler(program_id, accounts, amount)
         }
     };
 
