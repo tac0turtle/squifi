@@ -20,6 +20,7 @@ use fund::{
   accounts::{fund::FundType},
   instruction::FundInstruction,
 };
+use client::{create_fund, check_balance};
 
 type Error = Box<dyn std::error::Error>;
 
@@ -140,11 +141,11 @@ fn main() {
     
     let _ = match matches.subcommand() {
         ("init", Some(_arg_matches)) => {
-            command_create_pool(&config)
+            create_fund(&config)
         }
         ("balance", Some(arg_matches)) => {
             let pool = pubkey_of(arg_matches, "pool").unwrap();
-            command_balance(&config, pool)
+            check_balance(&config, pool)
         }
         _ => unreachable!(),
     };

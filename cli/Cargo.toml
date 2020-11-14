@@ -13,6 +13,7 @@ solana-client = "1.4.5"
 solana-cli-config = "1.4.5"
 solana-sdk = "1.4.5"
 fund = {path = "../"}
+client = {path = "../client/"}
 
 [[bin]]
 name = "spool"
