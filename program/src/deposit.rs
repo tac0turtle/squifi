@@ -20,7 +20,7 @@ pub fn handler(
     accounts: &[AccountInfo],
     amount: u64,
 ) -> Result<(), FundError> {
-    info!("process deposit");
+    info!("Handler: deposit");
 
     let acc_infos = &mut accounts.iter();
 
@@ -177,7 +177,7 @@ fn state_transistion(req: StateTransistionRequest) -> Result<(), FundError> {
             vault_acc_info.key,
             depositor_authority_acc_info.key,
             &[],
-            amount as u64,
+            amount,
         )?;
         program::invoke_signed(
             &deposit_instruction,
@@ -189,11 +189,10 @@ fn state_transistion(req: StateTransistionRequest) -> Result<(), FundError> {
             ],
             &[],
         )?;
-
-        info!("state transition deposit success");
-
-        Ok(())
     }
+    info!("state transition deposit success");
+
+    Ok(())
 }
 
 struct AccessControlRequest<'a, 'b> {

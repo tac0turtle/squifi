@@ -1,15 +1,20 @@
 use crate::access_control;
 use fund::{
-    accounts::{fund::Fund, vault::TokenVault},
+    accounts::{
+        fund::{Fund, FundType},
+        vault::TokenVault,
+    },
     error::{FundError, FundErrorCode},
 };
 use serum_common::pack::Pack;
+use solana_program::program_pack::Pack as TokenPack;
 use solana_program::{
     account_info::{next_account_info, AccountInfo},
     info, program,
     pubkey::Pubkey,
 };
 use spl_token::instruction;
+use spl_token::state::Account;
 use std::convert::Into;
 
 pub fn handler(
@@ -17,22 +22,24 @@ pub fn handler(
     accounts: &[AccountInfo],
     amount: u64,
 ) -> Result<(), FundError> {
-    info!("handler: withdraw");
-
+    info!("Handler: payback_withdraw");
     let acc_infos = &mut accounts.iter();
-    let vault_acc_info = next_account_info(acc_infos)?;
+
+    let token_program_acc_info = next_account_info(acc_infos)?;
+    let nft_program_acc_info = next_account_info(acc_infos)?;
+    let payback_vault_authority_acc_info = next_account_info(acc_infos)?;
+    let payback_vault_acc_info = next_account_info(acc_infos)?;
     let fund_acc_info = next_account_info(acc_infos)?;
     let withdraw_acc_info = next_account_info(acc_infos)?;
-    let vault_authority_acc_info = next_account_info(acc_infos)?;
-    let token_program_acc_info = next_account_info(acc_infos)?;
+    let nft_withdraw_acc_info = next_account_info(acc_infos)?;
 
     access_control(AccessControlRequest {
         program_id,
-        amount,
         fund_acc_info,
         withdraw_acc_info,
-        vault_acc_info,
-        vault_authority_acc_info,
+        nft_program_acc_info,
+        nft_withdraw_acc_info,
+        amount,
     })?;
 
     Fund::unpack_mut(
@@ -42,52 +49,57 @@ pub fn handler(
                 fund_acc,
                 fund_acc_info,
                 withdraw_acc_info,
-                vault_acc_info,
-                vault_authority_acc_info,
+                payback_vault_acc_info,
+                payback_vault_authority_acc_info,
                 token_program_acc_info,
+                nft_withdraw_acc_info,
                 amount,
             })
             .map_err(Into::into)
         },
     )?;
-
     Ok(())
 }
 
 fn access_control(req: AccessControlRequest) -> Result<(), FundError> {
     let AccessControlRequest {
         program_id,
-        amount,
         fund_acc_info,
         withdraw_acc_info,
-        vault_acc_info,
-        vault_authority_acc_info,
+        nft_program_acc_info,
+        nft_withdraw_acc_info,
+        amount,
     } = req;
 
     if !withdraw_acc_info.is_signer {
         return Err(FundErrorCode::Unauthorized)?;
     }
 
-    {
-        let fund = access_control::fund(fund_acc_info, program_id)?;
-        if (fund.balance - amount) < 0 {
-            return Err(FundErrorCode::FundBalanceOverflow)?;
-        }
-        let _ = access_control::vault_join(
-            vault_acc_info,
-            vault_authority_acc_info,
-            fund_acc_info,
-            program_id,
-        )?;
+    let fund = access_control::fund(fund_acc_info, program_id)?;
 
-        if fund.open {
-            return Err(FundErrorCode::FundOpen)?;
-        }
+    if !fund.fund_type.eq(&FundType::Raise {
+        private: (true || false),
+    }) {
+        return Err(FundErrorCode::InvalidFund)?;
     }
 
-    let _ = access_control::withdraw(program_id, fund_acc_info, withdraw_acc_info);
+    let token_acc = access_control::token(nft_program_acc_info)?;
 
-    info!("access control withdraw success");
+    if token_acc.mint != fund.nft_mint {
+        return Err(FundErrorCode::InvalidTokenAccountMint)?;
+    }
+
+    let dest_account = Account::unpack(&nft_withdraw_acc_info.data.borrow())?;
+
+    if dest_account.amount >= amount {
+        return Err(FundErrorCode::InvalidPayBackWithdrawlAddress)?;
+    }
+
+    if amount > fund.shares {
+        return Err(FundErrorCode::WithdrawlSizeOverflow)?;
+    }
+
+    let _ = access_control::fund(fund_acc_info, program_id)?;
 
     Ok(())
 }
@@ -97,23 +109,28 @@ fn state_transistion(req: StateTransistionRequest) -> Result<(), FundError> {
         fund_acc,
         fund_acc_info,
         withdraw_acc_info,
-        vault_acc_info,
-        vault_authority_acc_info,
+        payback_vault_acc_info,
+        payback_vault_authority_acc_info,
         token_program_acc_info,
+        nft_withdraw_acc_info: _,
         amount,
     } = req;
 
+    info!("State-Transistion: Withdraw Payback");
+
     {
-        fund_acc.deduct(amount);
+        // let nft_account_data = Account::unpack(&nft_withdraw_acc_info.data.borrow())?;
+        // let amount = fund_acc.get_share_dist(); // todo handle
+
         // transfer from program account to owner of fund
         info!("invoking token transfer");
         let withdraw_instruction = instruction::transfer(
             &spl_token::ID,
-            vault_acc_info.key,
+            payback_vault_acc_info.key,
             withdraw_acc_info.key,
-            &vault_authority_acc_info.key,
+            &payback_vault_authority_acc_info.key,
             &[],
-            amount,
+            amount, //todo current mapping is 1:1, not ideal
         )?;
 
         let signer_seeds = TokenVault::signer_seeds(fund_acc_info.key, &fund_acc.nonce);
@@ -121,35 +138,35 @@ fn state_transistion(req: StateTransistionRequest) -> Result<(), FundError> {
         program::invoke_signed(
             &withdraw_instruction,
             &[
-                vault_acc_info.clone(),
+                payback_vault_acc_info.clone(),
                 withdraw_acc_info.clone(),
-                vault_authority_acc_info.clone(),
+                payback_vault_authority_acc_info.clone(),
                 token_program_acc_info.clone(),
             ],
             &[&signer_seeds],
         )?;
     }
 
-    info!("state transition withdraw success");
-
+    info!("State-Transistion: Withdraw Payback Success");
     Ok(())
 }
 
 struct AccessControlRequest<'a, 'b> {
     program_id: &'a Pubkey,
-    amount: u64,
     fund_acc_info: &'a AccountInfo<'b>,
     withdraw_acc_info: &'a AccountInfo<'b>,
-    vault_acc_info: &'a AccountInfo<'b>,
-    vault_authority_acc_info: &'a AccountInfo<'b>,
+    nft_program_acc_info: &'a AccountInfo<'b>,
+    nft_withdraw_acc_info: &'a AccountInfo<'b>,
+    amount: u64,
 }
 
-struct StateTransistionRequest<'a, 'b, 'c> {
-    fund_acc: &'c mut Fund,
+struct StateTransistionRequest<'a, 'b> {
+    fund_acc: &'a mut Fund,
     fund_acc_info: &'a AccountInfo<'b>,
     withdraw_acc_info: &'a AccountInfo<'b>,
-    vault_acc_info: &'a AccountInfo<'b>,
-    vault_authority_acc_info: &'a AccountInfo<'b>,
+    payback_vault_acc_info: &'a AccountInfo<'b>,
+    payback_vault_authority_acc_info: &'a AccountInfo<'b>,
     token_program_acc_info: &'a AccountInfo<'b>,
+    nft_withdraw_acc_info: &'a AccountInfo<'b>,
     amount: u64,
 }

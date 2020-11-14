@@ -39,6 +39,9 @@ pub enum FundErrorCode {
     InvalidMintAuthority = 23,
     InvalidTokenAccountMint = 24,
     NotRentExempt = 25,
+    InvalidPayBackWithdrawlAddress = 26,
+    WithdrawlSizeOverflow = 27,
+    InvalidFund = 28,
 }
 
 impl std::fmt::Display for FundErrorCode {
