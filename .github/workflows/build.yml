@@ -19,4 +19,8 @@ jobs:
       - uses: actions-rs/cargo@v1
         with:
           command: build
-          args: --release --features program
+          args: --release --features program --manifest-path ./fund/Cargo.toml
+      - uses: actions-rs/cargo@v1
+        with:
+          command: build
+          args: --release --features program --manifest-path ./program/Cargo.toml
