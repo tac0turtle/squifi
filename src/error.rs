@@ -38,6 +38,7 @@ pub enum FundErrorCode {
     NFTTokenAccountMissing = 22,
     InvalidMintAuthority = 23,
     InvalidTokenAccountMint = 24,
+    NotRentExempt = 25,
 }
 
 impl std::fmt::Display for FundErrorCode {

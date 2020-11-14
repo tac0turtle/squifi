@@ -16,9 +16,10 @@ pub mod instruction {
         /// 1. `[writable]` Fund to create
         /// 2. `[writable]` Program controlled tokenvault.
         /// 3. `[]`         Mint
-        /// 4. `[writable]` Whitelist to initialize.
-        /// 5. `[writable]` Token mint representing the investment receipt.
-        /// 6. `[writable]` Token account associated with the mint.
+        /// 4. `[]`         Rent sysvar
+        /// 5. `[writable]` Whitelist to initialize.
+        /// 6. `[writable]` Token mint representing the investment receipt.
+        /// 7. `[writable]` Token account associated with the mint.
         Initialize {
             /// Owner of the Fund
             owner: Pubkey,
