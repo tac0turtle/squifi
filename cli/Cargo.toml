@@ -1,7 +1,8 @@
 [package]
-name = "spool-cli"
+name = "squifi-cli"
 version = "0.1.0"
 authors = ["Callum Michael Waters <cmwaters19@gmail.com>", "Marko Baricevic <marbar3778@yahoo.com>"]
+description = "Squifi - Squad Finance Command Line Tool"
 edition = "2018"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -13,6 +14,6 @@ fund = {path = "../"}
 client = {path = "../client/"}
 
 [[bin]]
-name = "spool"
+name = "squifi"
 path = "src/main.rs"
 
