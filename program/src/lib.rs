@@ -12,8 +12,10 @@ use solana_program::{
 pub(crate) mod access_control;
 mod close;
 mod deposit;
-mod init_payback;
 mod initialize;
+mod payback_deposit;
+mod payback_init;
+mod payback_withdraw;
 mod whitelist_add;
 mod whitelist_delete;
 mod withdraw;
@@ -53,7 +55,13 @@ fn process_instruction(
             whitelist_delete::handler(program_id, accounts, entry)
         }
         FundInstruction::InitializePayback { amount } => {
-            init_payback::handler(program_id, accounts, amount)
+            payback_init::handler(program_id, accounts, amount)
+        }
+        FundInstruction::PaybackWithdraw { amount } => {
+            payback_withdraw::handler(program_id, accounts, amount)
+        }
+        FundInstruction::PaybackDeposit { amount } => {
+            payback_deposit::handler(program_id, accounts, amount)
         }
     };
 

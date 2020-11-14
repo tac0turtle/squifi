@@ -74,6 +74,24 @@ pub mod instruction {
         /// 3. `[signer]`   Depositor auhtority.
         /// 4. `[]`         Token Program Account
         InitializePayback { amount: u64 },
+        /// PayBack Withdrwal allows the holder of the Fund NFT to withdraw rewards.
+        ///
+        /// 0. `[]`         SPL Token program
+        /// 1. `[]`         Fund SPL NFT program
+        /// 2. `[]`         Payback Vault Authority
+        /// 4. `[writable]` Payback Vault
+        /// 3. `[writable]` Fund
+        /// 5. `[]`         Withdraw Account
+        PaybackWithdraw { amount: u64 },
+        /// PayBack Deposit allows the fund owner to deposit more into the payback vault.
+        ///
+        /// 0. `[]`         SPL Token program
+        /// 1. `[]`         Fund SPL NFT program
+        /// 2. `[]`         Payback Vault Authority
+        /// 4. `[writable]` Payback Vault
+        /// 3. `[writable]` Fund
+        /// 5. `[]`         Withdraw Account
+        PaybackDeposit { amount: u64 },
     }
 }
 

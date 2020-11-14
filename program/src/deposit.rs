@@ -20,7 +20,7 @@ pub fn handler(
     accounts: &[AccountInfo],
     amount: u64,
 ) -> Result<(), FundError> {
-    info!("process deposit");
+    info!("Handler: deposit");
 
     let acc_infos = &mut accounts.iter();
 

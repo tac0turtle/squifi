@@ -46,7 +46,6 @@ pub fn handler(
         vault_acc_info,
         rent_acc_info,
         nft_mint_acc_info,
-        nft_token_acc_info,
         nonce: 0,
     })?;
 
@@ -83,7 +82,6 @@ fn access_control(req: AccessControlRequest) -> Result<(), FundError> {
         fund_acc_info,
         mint_acc_info,
         rent_acc_info,
-        nft_token_acc_info,
         nft_mint_acc_info,
         vault_acc_info,
         nonce,
@@ -114,7 +112,6 @@ fn access_control(req: AccessControlRequest) -> Result<(), FundError> {
         if vault.owner != vault_authority {
             return Err(FundErrorCode::InvalidVault)?;
         }
-        // todo check for rent exmpt
     }
 
     if fund.fund_type.eq(&FundType::Raise {
@@ -188,7 +185,6 @@ struct AccessControlRequest<'a, 'b> {
     mint_acc_info: &'a AccountInfo<'b>,
     rent_acc_info: &'a AccountInfo<'b>,
     nft_mint_acc_info: Option<&'a AccountInfo<'b>>,
-    nft_token_acc_info: Option<&'a AccountInfo<'b>>,
     vault_acc_info: &'a AccountInfo<'b>,
     nonce: u8,
 }

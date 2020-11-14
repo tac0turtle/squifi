@@ -1,9 +1,6 @@
 use crate::access_control;
 use fund::{
-    accounts::{
-        fund::{Fund, FundType},
-        vault::TokenVault,
-    },
+    accounts::fund::Fund,
     error::{FundError, FundErrorCode},
 };
 use serum_common::pack::Pack;
@@ -20,6 +17,7 @@ pub fn handler(
     accounts: &[AccountInfo],
     amount: u64,
 ) -> Result<(), FundError> {
+    info!("Handler: payback_init");
     let acc_infos = &mut accounts.iter();
 
     let payback_vault_acc_info = next_account_info(acc_infos)?;
@@ -85,6 +83,7 @@ fn state_transistion(req: StateTransistionRequest) -> Result<(), FundError> {
     info!("State-Transistion: Initialize Payback");
 
     fund_acc.payback_vault = payback_vault_acc_info.key.clone();
+    fund_acc.add_payback_bal(amount);
 
     {
         {
