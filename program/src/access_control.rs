@@ -12,12 +12,12 @@ use spl_token::state::{Account as TokenAccount, Mint};
 
 pub fn token(acc_info: &AccountInfo) -> Result<TokenAccount, FundError> {
     if *acc_info.owner != spl_token::ID {
-        return Err(FundErrorCode::InvalidAccountOwner)?;
+        return Err(FundErrorCode::InvalidAccountOwner.into());
     }
 
     let token = TokenAccount::unpack(&acc_info.try_borrow_data()?)?;
     if token.state != spl_token::state::AccountState::Initialized {
-        return Err(FundErrorCode::NotInitialized)?;
+        return Err(FundErrorCode::NotInitialized.into());
     }
 
     Ok(token)
@@ -25,12 +25,12 @@ pub fn token(acc_info: &AccountInfo) -> Result<TokenAccount, FundError> {
 
 pub fn fund(acc_info: &AccountInfo, program_id: &Pubkey) -> Result<Fund, FundError> {
     if acc_info.owner != program_id {
-        return Err(FundErrorCode::InvalidAccountOwner)?;
+        return Err(FundErrorCode::InvalidAccountOwner.into());
     }
 
     let fund = Fund::unpack(&acc_info.try_borrow_data()?)?;
     if !fund.initialized {
-        return Err(FundErrorCode::NotInitialized)?;
+        return Err(FundErrorCode::NotInitialized.into());
     }
 
     Ok(fund)
@@ -42,11 +42,11 @@ pub fn whitelist<'a>(
     program_id: &Pubkey,
 ) -> Result<Whitelist<'a>, FundError> {
     if program_id != wl_acc_info.owner {
-        return Err(FundErrorCode::InvalidAccountOwner)?;
+        return Err(FundErrorCode::InvalidAccountOwner.into());
     }
 
     if fund.whitelist != *wl_acc_info.key {
-        return Err(FundErrorCode::InvalidWhitelist)?;
+        return Err(FundErrorCode::InvalidWhitelist.into());
     }
     Whitelist::new(wl_acc_info).map_err(Into::into)
 }
@@ -57,13 +57,13 @@ pub fn check_owner(
     owner_acc_info: &AccountInfo,
 ) -> Result<(), FundError> {
     if !owner_acc_info.is_signer {
-        return Err(FundErrorCode::Unauthorized)?;
+        return Err(FundErrorCode::Unauthorized.into());
     }
 
     let fund = fund(acc_info, program_id)?;
 
     if !fund.owner.eq(owner_acc_info.key) {
-        return Err(FundErrorCode::InvalidAccountOwner)?;
+        return Err(FundErrorCode::InvalidAccountOwner.into());
     }
 
     Ok(())
@@ -73,7 +73,7 @@ pub fn fund_open(acc_info: &AccountInfo, program_id: &Pubkey) -> Result<(), Fund
     let fund = fund(acc_info, program_id)?;
 
     if !fund.open {
-        return Err(FundErrorCode::FundClosed)?;
+        return Err(FundErrorCode::FundClosed.into());
     }
 
     Ok(())
@@ -81,12 +81,12 @@ pub fn fund_open(acc_info: &AccountInfo, program_id: &Pubkey) -> Result<(), Fund
 
 pub fn mint(acc_info: &AccountInfo) -> Result<Mint, FundError> {
     if *acc_info.owner != spl_token::ID {
-        return Err(FundErrorCode::InvalidMint)?;
+        return Err(FundErrorCode::InvalidMint.into());
     }
 
     let mint = Mint::unpack(&acc_info.try_borrow_data()?)?;
     if !mint.is_initialized {
-        return Err(FundErrorCode::UnitializedTokenMint)?;
+        return Err(FundErrorCode::UnitializedTokenMint.into());
     }
 
     Ok(mint)
@@ -108,7 +108,7 @@ pub fn vault(
     let fund = fund(fund_acc_info, program_id)?;
     let vault = token(acc_info)?;
     if *acc_info.key != fund.vault {
-        return Err(FundErrorCode::InvalidVault)?;
+        return Err(FundErrorCode::InvalidVault.into());
     }
 
     let va = vault_authority(
@@ -119,10 +119,10 @@ pub fn vault(
     )?;
 
     if va != vault.owner {
-        return Err(FundErrorCode::InvalidVault)?;
+        return Err(FundErrorCode::InvalidVault.into());
     }
     if va != *vault_authority_acc_info.key {
-        return Err(FundErrorCode::InvalidVault)?;
+        return Err(FundErrorCode::InvalidVault.into());
     }
 
     Ok(vault)
@@ -137,7 +137,7 @@ pub fn payback_vault(
     let fund = fund(fund_acc_info, program_id)?;
     let vault = token(acc_info)?;
     if *acc_info.key != fund.payback_vault {
-        return Err(FundErrorCode::InvalidVault)?;
+        return Err(FundErrorCode::InvalidVault.into());
     }
 
     let va = vault_authority(
@@ -148,10 +148,10 @@ pub fn payback_vault(
     )?;
 
     if va != vault.owner {
-        return Err(FundErrorCode::InvalidVault)?;
+        return Err(FundErrorCode::InvalidVault.into());
     }
     if va != *vault_authority_acc_info.key {
-        return Err(FundErrorCode::InvalidVault)?;
+        return Err(FundErrorCode::InvalidVault.into());
     }
 
     Ok(vault)
@@ -178,10 +178,10 @@ pub fn vault_join(
     )?;
 
     if va != vault.owner {
-        return Err(FundErrorCode::InvalidVault)?;
+        return Err(FundErrorCode::InvalidVault.into());
     }
     if va != *vault_authority_acc_info.key {
-        return Err(FundErrorCode::InvalidVault)?;
+        return Err(FundErrorCode::InvalidVault.into());
     }
 
     Ok(vault)
@@ -199,7 +199,7 @@ pub fn vault_authority(
     )
     .map_err(|_| FundErrorCode::InvalidVaultNonce)?;
     if va != *vault_authority_acc_info.key {
-        return Err(FundErrorCode::InvalidVault)?;
+        return Err(FundErrorCode::InvalidVault.into());
     }
 
     Ok(va)
