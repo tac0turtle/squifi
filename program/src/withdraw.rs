@@ -113,7 +113,7 @@ fn state_transistion(req: StateTransistionRequest) -> Result<(), FundError> {
             withdraw_acc_info.key,
             &vault_authority_acc_info.key,
             &[],
-            amount as u64,
+            amount,
         )?;
 
         let signer_seeds = TokenVault::signer_seeds(fund_acc_info.key, &fund_acc.nonce);

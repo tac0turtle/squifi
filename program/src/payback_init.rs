@@ -94,7 +94,7 @@ fn state_transistion(req: StateTransistionRequest) -> Result<(), FundError> {
                 payback_vault_acc_info.key,
                 depositor_authority_acc_info.key,
                 &[],
-                amount as u64,
+                amount,
             )?;
             program::invoke_signed(
                 &deposit_instruction,
