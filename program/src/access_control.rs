@@ -213,13 +213,13 @@ pub fn withdraw(
     let fund = Fund::unpack(&fund_acc_info.try_borrow_data()?)?;
 
     if fund_acc_info.owner != program_id {
-        return Err(FundErrorCode::InvalidAccount)?;
+        return Err(FundErrorCode::InvalidAccount.into());
     }
     if !fund.initialized {
-        return Err(FundErrorCode::NotInitialized)?;
+        return Err(FundErrorCode::NotInitialized.into());
     }
     if fund.owner != *withdraw_acc_beneficiary_info.key {
-        return Err(FundErrorCode::Unauthorized)?;
+        return Err(FundErrorCode::Unauthorized.into());
     }
 
     Ok(fund)
@@ -229,7 +229,7 @@ pub fn check_balance(fund_acc_info: &AccountInfo, amount: u64) -> Result<(), Fun
     let fund = Fund::unpack(&fund_acc_info.try_borrow_data()?)?;
 
     if fund.balance + amount > fund.max_balance {
-        return Err(FundErrorCode::FundBalanceOverflow)?;
+        return Err(FundErrorCode::FundBalanceOverflow.into());
     }
 
     Ok(())
@@ -242,11 +242,11 @@ pub fn check_depositor<'a>(
     depositor_acc_info: &AccountInfo<'a>,
 ) -> Result<(), FundError> {
     if program_id != wl_acc_info.owner {
-        return Err(FundErrorCode::InvalidAccountOwner)?;
+        return Err(FundErrorCode::InvalidAccountOwner.into());
     }
 
     if fund.whitelist != *wl_acc_info.key {
-        return Err(FundErrorCode::InvalidWhitelist)?;
+        return Err(FundErrorCode::InvalidWhitelist.into());
     }
 
     let wl: Result<Whitelist, FundError> = Whitelist::new(wl_acc_info).map_err(Into::into);
@@ -263,10 +263,10 @@ pub fn check_nft<'a>(
 ) -> Result<(), FundError> {
     let token_acc = token(token_acc_info)?;
     if token_acc.mint != fund.nft_mint {
-        return Err(FundErrorCode::InvalidTokenAccountMint)?;
+        return Err(FundErrorCode::InvalidTokenAccountMint.into());
     }
     if token_acc.mint != *mint_acc_info.key {
-        return Err(FundErrorCode::InvalidMint)?;
+        return Err(FundErrorCode::InvalidMint.into());
     }
     Ok(())
 }

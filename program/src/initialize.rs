@@ -92,13 +92,13 @@ fn access_control(req: AccessControlRequest) -> Result<(), FundError> {
     let fund = Fund::unpack(&fund_acc_info.try_borrow_data()?)?;
     {
         if fund_acc_info.owner != program_id {
-            return Err(FundErrorCode::NotOwnedByProgram)?;
+            return Err(FundErrorCode::NotOwnedByProgram.into());
         }
         if !rent.is_exempt(fund_acc_info.lamports(), fund_acc_info.try_data_len()?) {
-            return Err(FundErrorCode::NotRentExempt)?;
+            return Err(FundErrorCode::NotRentExempt.into());
         }
         if fund.initialized {
-            return Err(FundErrorCode::AlreadyInitialized)?;
+            return Err(FundErrorCode::AlreadyInitialized.into());
         }
     }
 
@@ -110,7 +110,7 @@ fn access_control(req: AccessControlRequest) -> Result<(), FundError> {
         )
         .map_err(|_| FundErrorCode::InvalidVaultNonce)?;
         if vault.owner != vault_authority {
-            return Err(FundErrorCode::InvalidVault)?;
+            return Err(FundErrorCode::InvalidVault.into());
         }
     }
 
@@ -124,7 +124,7 @@ fn access_control(req: AccessControlRequest) -> Result<(), FundError> {
         )
         .map_err(|_| FundErrorCode::InvalidVaultNonce)?;
         if nft_mint.mint_authority != COption::Some(fund_authority) {
-            return Err(FundErrorCode::InvalidMintAuthority)?;
+            return Err(FundErrorCode::InvalidMintAuthority.into());
         }
     }
 
