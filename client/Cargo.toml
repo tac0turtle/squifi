@@ -7,7 +7,9 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-fund = {path = "../"}
+fund = {path = "../", features = ["client"]}
 serum-common = {git = "https://github.com/project-serum/serum-dex", features = ["program"]}
 solana-client = "1.4.5"
-solana-sdk = "1.4.5"
+solana-program = "1.4.5"
+anyhow = "1.0.32"
+thiserror = "1.0.20"

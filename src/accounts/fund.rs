@@ -2,6 +2,13 @@ use serde::{Deserialize, Serialize};
 use serum_common::pack::*;
 use solana_client_gen::solana_sdk::pubkey::Pubkey;
 
+#[cfg(feature = "client")]
+lazy_static::lazy_static! {
+    pub static ref SIZE: u64 = Fund::default()
+                .size()
+                .expect("Fund has a fixed size");
+}
+
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq)]
 pub enum FundType {
     /// similar to a gofundme
@@ -11,8 +18,14 @@ pub enum FundType {
     },
 }
 
+impl Default for FundType {
+    fn default() -> FundType {
+        FundType::FundMe
+    }
+}
+
 /// The Owner of the fund has the right to withdraw all or some of the funds
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Default)]
 pub struct Fund {
     /// check to see if a fund is ininitialized
     pub initialized: bool,
