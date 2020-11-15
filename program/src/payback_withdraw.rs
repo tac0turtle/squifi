@@ -52,7 +52,7 @@ pub fn handler(
                 payback_vault_acc_info,
                 payback_vault_authority_acc_info,
                 token_program_acc_info,
-                nft_withdraw_acc_info,
+                // nft_withdraw_acc_info,
                 amount,
             })
             .map_err(Into::into)
@@ -112,7 +112,7 @@ fn state_transistion(req: StateTransistionRequest) -> Result<(), FundError> {
         payback_vault_acc_info,
         payback_vault_authority_acc_info,
         token_program_acc_info,
-        nft_withdraw_acc_info: _,
+        // nft_withdraw_acc_info: _,
         amount,
     } = req;
 
