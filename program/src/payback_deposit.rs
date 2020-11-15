@@ -65,7 +65,7 @@ fn access_control(req: AccessControlRequest) -> Result<(), FundError> {
     } = req;
 
     if !depositor_authority_acc_info.is_signer {
-        return Err(FundErrorCode::Unauthorized)?;
+        return Err(FundErrorCode::Unauthorized.into());
     }
 
     let _ = access_control::fund(fund_acc_info, program_id)?;
