@@ -94,7 +94,7 @@ pub fn mint(acc_info: &AccountInfo) -> Result<Mint, FundError> {
 
 pub fn rent(acc_info: &AccountInfo) -> Result<Rent, FundError> {
     if *acc_info.key != solana_program::sysvar::rent::id() {
-        return Err(FundErrorCode::InvalidRentSysvar)?;
+        return Err(FundErrorCode::InvalidRentSysvar.into());
     }
     Rent::from_account_info(acc_info).map_err(Into::into)
 }

@@ -82,7 +82,7 @@ fn state_transistion(req: StateTransistionRequest) -> Result<(), FundError> {
 
     info!("State-Transistion: Initialize Payback");
 
-    fund_acc.payback_vault = payback_vault_acc_info.key.clone();
+    fund_acc.payback_vault = *payback_vault_acc_info.key;
     fund_acc.add_payback_bal(amount);
 
     {

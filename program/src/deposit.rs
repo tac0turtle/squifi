@@ -86,7 +86,7 @@ fn access_control(req: AccessControlRequest) -> Result<(), FundError> {
     } = req;
 
     if !depositor_authority_acc_info.is_signer {
-        return Err(FundErrorCode::Unauthorized)?;
+        return Err(FundErrorCode::Unauthorized.into());
     }
     {
         // let rent = access_control::rent(rent_acc_info)?;
@@ -100,9 +100,9 @@ fn access_control(req: AccessControlRequest) -> Result<(), FundError> {
         let _ = access_control::check_balance(fund_acc_info, amount)?;
         let _ = access_control::fund_open(fund_acc_info, program_id)?;
         // check if the despoitor is part of the whitelist.
-        if fund.fund_type.eq(&FundType::Raise {
-            private: (true || false),
-        }) {
+        if fund.fund_type.eq(&FundType::Raise { private: true })
+            || fund.fund_type.eq(&FundType::Raise { private: false })
+        {
             let _ = access_control::check_nft(
                 &fund,
                 nft_mint_acc_info
@@ -146,9 +146,9 @@ fn state_transistion(req: StateTransistionRequest) -> Result<(), FundError> {
     } = req;
 
     {
-        if fund_acc.fund_type.eq(&FundType::Raise {
-            private: (true || false),
-        }) {
+        if fund_acc.fund_type.eq(&FundType::Raise { private: false })
+            || fund_acc.fund_type.eq(&FundType::Raise { private: true })
+        {
             info!("invoke SPL token mint");
             let mint_to_instr = instruction::mint_to(
                 &spl_token::ID,

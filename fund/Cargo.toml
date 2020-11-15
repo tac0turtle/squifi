@@ -5,9 +5,14 @@ name = "fund"
 repository = "https://github.com/marbar3778/squad_finance"
 version = "0.1.0"
 
+[lib]
+crate-type = ["cdylib", "lib"]
+name = "fund"
+
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [features]
 program = ["solana-client-gen/program", "spl-token/program", "serum-common/program"]
+default = []
 
 [dependencies]
 arrayref = "0.3.6"
