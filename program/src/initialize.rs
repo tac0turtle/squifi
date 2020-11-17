@@ -92,13 +92,13 @@ fn access_control(req: AccessControlRequest) -> Result<(), FundError> {
     let fund = Fund::unpack(&fund_acc_info.try_borrow_data()?)?;
     {
         if fund_acc_info.owner != program_id {
-            return Err(FundErrorCode::NotOwnedByProgram)?;
+            return Err(FundErrorCode::NotOwnedByProgram.into());
         }
         if !rent.is_exempt(fund_acc_info.lamports(), fund_acc_info.try_data_len()?) {
-            return Err(FundErrorCode::NotRentExempt)?;
+            return Err(FundErrorCode::NotRentExempt.into());
         }
         if fund.initialized {
-            return Err(FundErrorCode::AlreadyInitialized)?;
+            return Err(FundErrorCode::AlreadyInitialized.into());
         }
     }
 
@@ -110,13 +110,13 @@ fn access_control(req: AccessControlRequest) -> Result<(), FundError> {
         )
         .map_err(|_| FundErrorCode::InvalidVaultNonce)?;
         if vault.owner != vault_authority {
-            return Err(FundErrorCode::InvalidVault)?;
+            return Err(FundErrorCode::InvalidVault.into());
         }
     }
 
-    if fund.fund_type.eq(&FundType::Raise {
-        private: (true || false),
-    }) {
+    if fund.fund_type.eq(&FundType::Raise { private: false })
+        || fund.fund_type.eq(&FundType::Raise { private: true })
+    {
         let nft_mint = access_control::mint(nft_mint_acc_info.unwrap())?;
         let fund_authority = Pubkey::create_program_address(
             &TokenVault::signer_seeds(&fund_acc_info.key, &fund.nonce),
@@ -124,7 +124,7 @@ fn access_control(req: AccessControlRequest) -> Result<(), FundError> {
         )
         .map_err(|_| FundErrorCode::InvalidVaultNonce)?;
         if nft_mint.mint_authority != COption::Some(fund_authority) {
-            return Err(FundErrorCode::InvalidMintAuthority)?;
+            return Err(FundErrorCode::InvalidMintAuthority.into());
         }
     }
 
@@ -164,11 +164,11 @@ fn state_transition(req: StateTransitionRequest) -> Result<(), FundError> {
     fund_acc.fund_type = fund_type;
     fund_acc.nonce = nonce;
 
-    if fund_type.eq(&FundType::Raise {
-        private: (true || false),
-    }) {
-        fund_acc.nft_mint = nft_mint_acc_info.unwrap().key.clone();
-        fund_acc.nft_account = nft_token_acc_info.unwrap().key.clone();
+    if fund_type.eq(&FundType::Raise { private: false })
+        || fund_type.eq(&FundType::Raise { private: true })
+    {
+        fund_acc.nft_mint = *nft_mint_acc_info.unwrap().key;
+        fund_acc.nft_account = *nft_token_acc_info.unwrap().key;
     }
     if fund_type.eq(&FundType::Raise { private: true }) {
         fund_acc.whitelist = *whitelist_acc_info.unwrap().key;

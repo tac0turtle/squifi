@@ -60,7 +60,7 @@ fn access_control(req: AccessControlRequest) -> Result<(), FundError> {
     } = req;
 
     if !depositor_authority_acc_info.is_signer {
-        return Err(FundErrorCode::Unauthorized)?;
+        return Err(FundErrorCode::Unauthorized.into());
     }
 
     let _ = access_control::fund(fund_acc_info, program_id)?;
@@ -82,7 +82,7 @@ fn state_transistion(req: StateTransistionRequest) -> Result<(), FundError> {
 
     info!("State-Transistion: Initialize Payback");
 
-    fund_acc.payback_vault = payback_vault_acc_info.key.clone();
+    fund_acc.payback_vault = *payback_vault_acc_info.key;
     fund_acc.add_payback_bal(amount);
 
     {

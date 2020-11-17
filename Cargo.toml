@@ -1,20 +1,6 @@
-[package]
-authors = ["Marko Baricevic <marbar3778@yahoo.com>"]
-edition = "2018"
-name = "fund"
-repository = "https://github.com/marbar3778/squad_finance"
-version = "0.1.0"
+[workspace]
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-[features]
-program = ["solana-client-gen/program", "spl-token/program", "serum-common/program"]
-
-[dependencies]
-arrayref = "0.3.6"
-bytemuck = "1.4.1"
-num_enum = "0.5.0"
-serde = {version = "1.0", features = ["derive"]}
-serum-common = {git = "https://github.com/project-serum/serum-dex"}
-solana-client-gen = {git = "https://github.com/project-serum/serum-dex"}
-spl-token = {version = "2.0.8", default-features = false}
-thiserror = "1.0.20"
+members = [
+    "program",
+    "fund",
+]

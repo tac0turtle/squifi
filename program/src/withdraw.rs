@@ -57,7 +57,7 @@ pub fn handler(
 fn access_control(req: AccessControlRequest) -> Result<(), FundError> {
     let AccessControlRequest {
         program_id,
-        amount,
+        amount: _,
         fund_acc_info,
         withdraw_acc_info,
         vault_acc_info,
@@ -65,14 +65,11 @@ fn access_control(req: AccessControlRequest) -> Result<(), FundError> {
     } = req;
 
     if !withdraw_acc_info.is_signer {
-        return Err(FundErrorCode::Unauthorized)?;
+        return Err(FundErrorCode::Unauthorized.into());
     }
 
     {
         let fund = access_control::fund(fund_acc_info, program_id)?;
-        if (fund.balance - amount) < 0 {
-            return Err(FundErrorCode::FundBalanceOverflow)?;
-        }
         let _ = access_control::vault_join(
             vault_acc_info,
             vault_authority_acc_info,
@@ -81,7 +78,7 @@ fn access_control(req: AccessControlRequest) -> Result<(), FundError> {
         )?;
 
         if fund.open {
-            return Err(FundErrorCode::FundOpen)?;
+            return Err(FundErrorCode::FundOpen.into());
         }
     }
 

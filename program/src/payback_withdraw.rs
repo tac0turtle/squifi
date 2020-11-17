@@ -52,7 +52,7 @@ pub fn handler(
                 payback_vault_acc_info,
                 payback_vault_authority_acc_info,
                 token_program_acc_info,
-                nft_withdraw_acc_info,
+                // nft_withdraw_acc_info,
                 amount,
             })
             .map_err(Into::into)
@@ -72,7 +72,7 @@ fn access_control(req: AccessControlRequest) -> Result<(), FundError> {
     } = req;
 
     if !withdraw_acc_info.is_signer {
-        return Err(FundErrorCode::Unauthorized)?;
+        return Err(FundErrorCode::Unauthorized.into());
     }
 
     let fund = access_control::fund(fund_acc_info, program_id)?;
@@ -80,23 +80,23 @@ fn access_control(req: AccessControlRequest) -> Result<(), FundError> {
     if !fund.fund_type.eq(&FundType::Raise {
         private: (true || false),
     }) {
-        return Err(FundErrorCode::InvalidFund)?;
+        return Err(FundErrorCode::InvalidFund.into());
     }
 
     let token_acc = access_control::token(nft_program_acc_info)?;
 
     if token_acc.mint != fund.nft_mint {
-        return Err(FundErrorCode::InvalidTokenAccountMint)?;
+        return Err(FundErrorCode::InvalidTokenAccountMint.into());
     }
 
     let dest_account = Account::unpack(&nft_withdraw_acc_info.data.borrow())?;
 
     if dest_account.amount >= amount {
-        return Err(FundErrorCode::InvalidPayBackWithdrawlAddress)?;
+        return Err(FundErrorCode::InvalidPayBackWithdrawlAddress.into());
     }
 
     if amount > fund.shares {
-        return Err(FundErrorCode::WithdrawlSizeOverflow)?;
+        return Err(FundErrorCode::WithdrawlSizeOverflow.into());
     }
 
     let _ = access_control::fund(fund_acc_info, program_id)?;
@@ -112,7 +112,7 @@ fn state_transistion(req: StateTransistionRequest) -> Result<(), FundError> {
         payback_vault_acc_info,
         payback_vault_authority_acc_info,
         token_program_acc_info,
-        nft_withdraw_acc_info: _,
+        // nft_withdraw_acc_info: _,
         amount,
     } = req;
 
@@ -167,6 +167,6 @@ struct StateTransistionRequest<'a, 'b> {
     payback_vault_acc_info: &'a AccountInfo<'b>,
     payback_vault_authority_acc_info: &'a AccountInfo<'b>,
     token_program_acc_info: &'a AccountInfo<'b>,
-    nft_withdraw_acc_info: &'a AccountInfo<'b>,
+    // nft_withdraw_acc_info: &'a AccountInfo<'b>,
     amount: u64,
 }

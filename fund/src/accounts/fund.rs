@@ -60,9 +60,9 @@ impl Fund {
     /// Add adds the depoist amount to the total balance and shares
     pub fn add(&mut self, amount: u64) {
         self.balance += amount;
-        if self.fund_type.eq(&FundType::Raise {
-            private: (true || false),
-        }) {
+        if self.fund_type.eq(&FundType::Raise { private: true })
+            || self.fund_type.eq(&FundType::Raise { private: false })
+        {
             self.shares += amount;
         }
     }
