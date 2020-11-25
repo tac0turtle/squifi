@@ -1,0 +1,16 @@
+[package]
+name = "client"
+version = "0.1.0"
+authors = ["Marko Baricevic <marbar3778@yahoo.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+fund = { path = "../fund", features = ["client"] }
+solana-client-gen = { git = "https://github.com/project-serum/serum-dex" }
+anyhow = "1.0.32"
+thiserror = "1.0.20"
+serum-common = { git = "https://github.com/project-serum/serum-dex" }
+solana-client = { version = "1.4.10" }
+spl-token = { version = "2.0.6", default-features = false }

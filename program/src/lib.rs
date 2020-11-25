@@ -37,6 +37,7 @@ fn process_instruction(
             authority,
             max_balance,
             fund_type,
+            nonce,
         } => initialize::handler(
             program_id,
             accounts,
@@ -44,6 +45,7 @@ fn process_instruction(
             authority,
             max_balance,
             fund_type,
+            nonce,
         ),
         FundInstruction::Deposit { amount } => deposit::handler(program_id, accounts, amount),
         FundInstruction::Withdraw { amount } => withdraw::handler(program_id, accounts, amount),

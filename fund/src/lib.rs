@@ -16,9 +16,10 @@ pub mod instruction {
         /// 1. `[writable]` Tokenvault.
         /// 2. `[]`         Mint
         /// 3. `[]`         Rent sysvar
-        /// 4. `[writable]` Whitelist to initialize.
-        /// 5. `[writable]` Token mint representing the investment receipt.
-        /// 6. `[writable]` Token account associated with the mint.
+        /// 4. `[]`         Token program account
+        /// 5. `[writable]` Whitelist to initialize.
+        /// 6. `[writable]` Token mint representing the investment receipt.
+        /// 7. `[writable]` Token account associated with the mint.
         Initialize {
             /// Owner of the Fund
             owner: Pubkey,
@@ -28,6 +29,8 @@ pub mod instruction {
             max_balance: u64,
             /// fund type
             fund_type: accounts::fund::FundType,
+            /// program derived account information
+            nonce: u8,
         },
         /// Deposit sends tokens to a fund.
         ///

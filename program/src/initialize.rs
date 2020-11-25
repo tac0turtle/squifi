@@ -25,6 +25,7 @@ pub fn handler(
     authority: Pubkey,
     max_balance: u64,
     fund_type: FundType,
+    nonce: u8,
 ) -> Result<(), FundError> {
     info!("Initialize Fund");
 
@@ -33,6 +34,7 @@ pub fn handler(
     let vault_acc_info = next_account_info(acc_infos)?;
     let mint_acc_info = next_account_info(acc_infos)?;
     let rent_acc_info = next_account_info(acc_infos)?;
+    let token_program_acc_info = next_account_info(acc_infos)?;
 
     // Optional accounts
     let whitelist_acc_info = acc_infos.next();
@@ -46,7 +48,7 @@ pub fn handler(
         vault_acc_info,
         rent_acc_info,
         nft_mint_acc_info,
-        nonce: 0,
+        nonce,
     })?;
 
     // 2. Creation
@@ -59,13 +61,14 @@ pub fn handler(
                 owner,
                 authority,
                 mint: mint_acc_info.key,
+                token_program: token_program_acc_info.key,
+                vault: *vault_acc_info.key,
+                fund_type,
+                nonce,
+                max_balance,
+                whitelist_acc_info,
                 nft_mint_acc_info,
                 nft_token_acc_info,
-                vault: *vault_acc_info.key,
-                whitelist_acc_info,
-                fund_type,
-                nonce: 0,
-                max_balance,
             })
             .map_err(Into::into)
         },
@@ -145,11 +148,12 @@ fn state_transition(req: StateTransitionRequest) -> Result<(), FundError> {
         authority,
         vault,
         mint,
-        nft_mint_acc_info,
-        nft_token_acc_info,
         fund_type,
         nonce,
         max_balance,
+        token_program,
+        nft_mint_acc_info,
+        nft_token_acc_info,
         whitelist_acc_info,
     } = req;
 
@@ -192,13 +196,14 @@ struct AccessControlRequest<'a, 'b> {
 struct StateTransitionRequest<'a, 'b> {
     fund_acc: &'a mut Fund,
     owner: Pubkey,
-    mint: &'a Pubkey,
-    whitelist_acc_info: Option<&'a AccountInfo<'b>>,
-    nft_token_acc_info: Option<&'a AccountInfo<'b>>,
-    nft_mint_acc_info: Option<&'a AccountInfo<'b>>,
-    vault: Pubkey,
     authority: Pubkey,
     fund_type: FundType,
+    token_program: &'a Pubkey,
+    mint: &'a Pubkey,
+    vault: Pubkey,
     nonce: u8,
     max_balance: u64,
+    whitelist_acc_info: Option<&'a AccountInfo<'b>>,
+    nft_mint_acc_info: Option<&'a AccountInfo<'b>>,
+    nft_token_acc_info: Option<&'a AccountInfo<'b>>,
 }

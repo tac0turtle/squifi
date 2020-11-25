@@ -10,9 +10,14 @@ pub enum FundType {
         private: bool,
     },
 }
+impl Default for FundType {
+    fn default() -> Self {
+        FundType::FundMe
+    }
+}
 
 /// The Owner of the fund has the right to withdraw all or some of the funds
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Default, Serialize, Deserialize)]
 pub struct Fund {
     /// check to see if a fund is ininitialized
     pub initialized: bool,
@@ -24,6 +29,8 @@ pub struct Fund {
     pub owner: Pubkey,
     /// Owner authority
     pub authority: Pubkey,
+    /// token program account
+    pub token_program: Pubkey,
     /// max size of the fund
     pub max_balance: u64,
     /// balance of the
