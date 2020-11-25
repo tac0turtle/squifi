@@ -21,8 +21,6 @@ pub mod instruction {
         /// 6. `[writable]` Token mint representing the investment receipt.
         /// 7. `[writable]` Token account associated with the mint.
         Initialize {
-            /// Owner of the Fund
-            owner: Pubkey,
             /// Authority of the Fund
             authority: Pubkey,
             /// Max Size of a fund

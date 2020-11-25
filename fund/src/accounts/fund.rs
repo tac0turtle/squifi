@@ -25,8 +25,6 @@ pub struct Fund {
     pub open: bool,
     /// type of fund
     pub fund_type: FundType,
-    /// fund Owner
-    pub owner: Pubkey,
     /// Owner authority
     pub authority: Pubkey,
     /// token program account

@@ -1,5 +1,5 @@
-use crate::InitializeFundmeResponse;
-use fund::accounts::fund::Fund;
+use crate::InitializeResponse;
+use fund::accounts::fund::{Fund, FundType};
 use fund::client::{Client as InnerClient, ClientError as InnerClientError};
 use serum_common::client::rpc;
 use serum_common::pack::Pack;
@@ -11,10 +11,11 @@ use solana_client_gen::solana_sdk::system_instruction;
 
 pub fn create_all_accounts_and_initialize_fundme(
     client: &InnerClient,
-    owner: &Keypair,
     token_mint: &Pubkey,
     fund_authority: &Pubkey,
-) -> Result<InitializeFundmeResponse, InnerClientError> {
+    max_balance: u64,
+    fund_type: FundType,
+) -> Result<InitializeResponse, InnerClientError> {
     let fund_acc = Keypair::generate(&mut OsRng);
     let (fund_vault_authority, nonce) =
         Pubkey::find_program_address(&[fund_acc.pubkey().as_ref()], client.program());
@@ -50,8 +51,14 @@ pub fn create_all_accounts_and_initialize_fundme(
             AccountMeta::new_readonly(solana_sdk::sysvar::rent::id(), false),
         ];
 
-        let initialize_instr =
-            fund::instruction::initialize(*client.program(), &accounts, *fund_authority, nonce);
+        let initialize_instr = fund::instruction::initialize(
+            *client.program(),
+            &accounts,
+            *fund_authority,
+            max_balance,
+            fund_type,
+            nonce,
+        );
 
         vec![
             create_fund_acc_instr,
@@ -82,12 +89,12 @@ pub fn create_all_accounts_and_initialize_fundme(
             client.options().tx,
         )
         .map_err(InnerClientError::RpcError)
-        .map(|sig| InitializeFundmeResponse {
+        .map(|sig| InitializeResponse {
             tx: sig,
             fund: fund_acc.pubkey(),
             vault_authority: fund_vault_authority,
             vault: fund_vault.pubkey(),
-            // whitelist: wl_kp.pubkey(),
+            whitelist: None,
             nonce,
         })
 }
