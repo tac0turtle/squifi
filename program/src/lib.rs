@@ -13,9 +13,7 @@ pub(crate) mod access_control;
 mod close;
 mod deposit;
 mod initialize;
-mod payback_deposit;
-mod payback_init;
-mod payback_withdraw;
+mod register_payback;
 mod whitelist_add;
 mod whitelist_delete;
 mod withdraw;
@@ -54,14 +52,8 @@ fn process_instruction(
         FundInstruction::WhitelistDelete { entry } => {
             whitelist_delete::handler(program_id, accounts, entry)
         }
-        FundInstruction::InitializePayback { amount } => {
+        FundInstruction::RegisterPayback { amount } => {
             payback_init::handler(program_id, accounts, amount)
-        }
-        FundInstruction::PaybackWithdraw { amount } => {
-            payback_withdraw::handler(program_id, accounts, amount)
-        }
-        FundInstruction::PaybackDeposit { amount } => {
-            payback_deposit::handler(program_id, accounts, amount)
         }
     };
 

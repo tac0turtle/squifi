@@ -45,6 +45,9 @@ pub struct Fund {
     pub nft_mint: Pubkey,
     /// whitelist represents a list of pubkeys that can deposit into a fund
     pub whitelist: Pubkey,
+
+    /// Payback info
+
     /// payback token vault
     pub payback_vault: Pubkey,
     /// payback balance
@@ -76,8 +79,8 @@ impl Fund {
         self.payback_bal += amount;
     }
 
-    pub fn get_share_dist() -> u64 {
-        1
+    pub fn get_share_dist(amount: u64) -> u64 {
+        1u64 * amount
     }
 }
 
