@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 use serum_common::pack::*;
-use solana_client_gen::solana_sdk::pubkey::Pubkey;
+use solana_client_gen::prelude::*;
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq)]
 pub enum FundType {
@@ -48,10 +48,10 @@ pub struct Fund {
 
     /// Payback info
 
-    /// payback token vault
-    pub payback_vault: Pubkey,
     /// payback balance
-    pub payback_bal: u64,
+    pub payback_total: u64,
+    /// amount of token returned
+    pub payback_per_share: u64,
 }
 
 impl Fund {
@@ -76,11 +76,10 @@ impl Fund {
         }
     }
     pub fn add_payback_bal(&mut self, amount: u64) {
-        self.payback_bal += amount;
+        self.payback_total += amount;
     }
-
-    pub fn get_share_dist(amount: u64) -> u64 {
-        1u64 * amount
+    pub fn add_payback_per_share(&mut self, amount: u64) {
+        self.payback_per_share += amount;
     }
 }
 

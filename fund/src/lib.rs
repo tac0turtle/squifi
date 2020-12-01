@@ -69,9 +69,8 @@ pub mod instruction {
         /// InitilaizePayback creates a program address to pay back token holders
         ///
         /// 0. `[writable]` Fund
-        /// 1. `[writable]` Depositor token account.
-        /// 2. `[signer]`   Depositor auhtority.
-        /// 3. `[]`         Token Program Account
+        /// 1. `[signer]`   Depositor auhtority.
+        /// 2. `[]`         Token Program Account
         RegisterPayback { amount: u64 },
     }
 }

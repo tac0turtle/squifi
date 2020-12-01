@@ -16,6 +16,6 @@ program = ["spl-token/program", "spl-token/no-entrypoint", "fund/program"]
 
 [dependencies]
 fund = {path = "../fund"}
-serum-common = {git = "https://github.com/project-serum/serum-dex", features = ["program"]}
+serum-common = {git = "https://github.com/project-serum/serum-dex", features = ["program"], rev = "a166569"}
 solana-program = {version = "1.4.5", default-features = false}
 spl-token = {version = "2.0.6", default-features = false}

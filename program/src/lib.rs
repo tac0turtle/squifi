@@ -1,5 +1,7 @@
 //! Program entrypoint
 
+#![cfg_attr(feature = "strict", deny(warnings))]
+
 use fund::{
     error::{FundError, FundErrorCode},
     instruction::FundInstruction,
@@ -53,7 +55,7 @@ fn process_instruction(
             whitelist_delete::handler(program_id, accounts, entry)
         }
         FundInstruction::RegisterPayback { amount } => {
-            payback_init::handler(program_id, accounts, amount)
+            register_payback::handler(program_id, accounts, amount)
         }
     };
 

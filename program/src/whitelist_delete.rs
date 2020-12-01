@@ -1,6 +1,6 @@
 use crate::access_control;
 use fund::{
-    accounts::whitelist::Whitelist,
+    accounts::Whitelist,
     error::{FundError, FundErrorCode},
 };
 use solana_program::{
