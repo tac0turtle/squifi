@@ -73,7 +73,6 @@ pub mod instruction {
         ///
         /// 0. `[writable]` Fund
         /// 1. `[signer]`   Depositor auhtority.
-        /// 2. `[]`         Token Program Account
         RegisterPayback { amount: u64 },
     }
 }

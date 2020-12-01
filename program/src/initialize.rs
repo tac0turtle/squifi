@@ -169,6 +169,7 @@ fn state_transition(req: StateTransitionRequest) -> Result<(), FundError> {
     {
         fund_acc.nft_mint = *nft_mint_acc_info.unwrap().key;
         fund_acc.nft_account = *nft_token_acc_info.unwrap().key;
+        fund_acc.round = 0u32;
     }
     if fund_type.eq(&FundType::Raise { private: true }) {
         fund_acc.whitelist = *whitelist_acc_info.unwrap().key;

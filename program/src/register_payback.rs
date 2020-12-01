@@ -1,6 +1,6 @@
 use crate::access_control;
 use fund::{
-    accounts::Fund,
+    accounts::{fund::Payback, Fund},
     error::{FundError, FundErrorCode},
 };
 use serum_common::pack::Pack;
@@ -9,7 +9,6 @@ use solana_program::{
     info,
     pubkey::Pubkey,
 };
-use spl_token::instruction;
 use std::convert::Into;
 
 pub fn handler(
@@ -22,7 +21,6 @@ pub fn handler(
 
     let fund_acc_info = next_account_info(acc_infos)?;
     let owner_acc_info = next_account_info(acc_infos)?;
-    let token_program_acc_info = next_account_info(acc_infos)?;
 
     access_control(AccessControlRequest {
         program_id,
@@ -33,13 +31,7 @@ pub fn handler(
     Fund::unpack_mut(
         &mut fund_acc_info.try_borrow_mut_data()?,
         &mut |fund_acc: &mut Fund| {
-            state_transistion(StateTransistionRequest {
-                fund_acc,
-                owner_acc_info,
-                token_program_acc_info,
-                amount,
-            })
-            .map_err(Into::into)
+            state_transistion(StateTransistionRequest { fund_acc, amount }).map_err(Into::into)
         },
     )?;
 
@@ -65,18 +57,12 @@ fn access_control(req: AccessControlRequest) -> Result<(), FundError> {
 }
 
 fn state_transistion(req: StateTransistionRequest) -> Result<(), FundError> {
-    let StateTransistionRequest {
-        fund_acc,
-        owner_acc_info,
-        token_program_acc_info,
-        amount,
-    } = req;
+    let StateTransistionRequest { fund_acc, amount } = req;
 
     info!("State-Transistion: Initialize Payback");
 
-    fund_acc.add_payback_bal(amount);
     let per_share = fund_acc.shares.checked_div(amount).unwrap();
-    fund_acc.add_payback_per_share(per_share);
+    fund_acc.add_new_payback(amount, per_share);
 
     info!("State-Transistion: Initialize Payback Success");
     Ok(())
@@ -88,9 +74,7 @@ struct AccessControlRequest<'a, 'b> {
     owner_acc_info: &'a AccountInfo<'b>,
 }
 
-struct StateTransistionRequest<'a, 'b> {
+struct StateTransistionRequest<'a> {
     fund_acc: &'a mut Fund,
-    owner_acc_info: &'a AccountInfo<'b>,
-    token_program_acc_info: &'a AccountInfo<'b>,
     amount: u64,
 }
