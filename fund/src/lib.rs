@@ -1,4 +1,7 @@
-use serde::{Deserialize, Serialize};
+#![cfg_attr(feature = "strict", deny(warnings))]
+#![allow(dead_code)]
+
+use borsh::{BorshDeserialize, BorshSchema, BorshSerialize};
 use serum_common::pack::*;
 use solana_client_gen::prelude::*;
 
@@ -8,7 +11,7 @@ pub mod error;
 #[cfg_attr(feature = "client", solana_client_gen)]
 pub mod instruction {
     use super::*;
-    #[derive(Serialize, Deserialize)]
+    #[derive(Debug, BorshSerialize, BorshDeserialize, BorshSchema)]
     pub enum FundInstruction {
         /// Initializes a new Fund & Fund Account
         ///
