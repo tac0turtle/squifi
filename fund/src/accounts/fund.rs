@@ -1,8 +1,8 @@
-use serde::{Deserialize, Serialize};
+use borsh::{BorshDeserialize, BorshSchema, BorshSerialize};
 use serum_common::pack::*;
 use solana_client_gen::prelude::*;
 
-#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Clone, Copy, BorshSerialize, BorshDeserialize, BorshSchema, PartialEq)]
 pub enum FundType {
     /// similar to a gofundme
     FundMe,
@@ -11,8 +11,14 @@ pub enum FundType {
     },
 }
 
+impl Default for FundType {
+    fn default() -> Self {
+        FundType::FundMe
+    }
+}
+
 /// The Owner of the fund has the right to withdraw all or some of the funds
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Default, Debug, BorshSerialize, BorshDeserialize, BorshSchema)]
 pub struct Fund {
     /// check to see if a fund is ininitialized
     pub initialized: bool,
