@@ -42,6 +42,7 @@ pub enum FundErrorCode {
     InvalidPayBackWithdrawlAddress = 26,
     WithdrawlSizeOverflow = 27,
     InvalidFund = 28,
+    InsufficientBalance = 29,
 }
 
 impl std::fmt::Display for FundErrorCode {

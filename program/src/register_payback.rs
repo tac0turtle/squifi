@@ -1,6 +1,6 @@
 use crate::access_control;
 use fund::{
-    accounts::{fund::Payback, Fund},
+    accounts::Fund,
     error::{FundError, FundErrorCode},
 };
 use serum_common::pack::Pack;
@@ -59,12 +59,12 @@ fn access_control(req: AccessControlRequest) -> Result<(), FundError> {
 fn state_transistion(req: StateTransistionRequest) -> Result<(), FundError> {
     let StateTransistionRequest { fund_acc, amount } = req;
 
-    info!("State-Transistion: Initialize Payback");
+    info!("State-Transistion: Initialize Register Payback");
 
     let per_share = fund_acc.shares.checked_div(amount).unwrap();
     fund_acc.add_new_payback(amount, per_share);
 
-    info!("State-Transistion: Initialize Payback Success");
+    info!("State-Transistion: Initialize Register Payback Success");
     Ok(())
 }
 

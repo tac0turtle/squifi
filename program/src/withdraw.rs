@@ -57,7 +57,7 @@ pub fn handler(
 fn access_control(req: AccessControlRequest) -> Result<(), FundError> {
     let AccessControlRequest {
         program_id,
-        amount: _,
+        amount,
         fund_acc_info,
         withdraw_acc_info,
         vault_acc_info,
@@ -79,6 +79,9 @@ fn access_control(req: AccessControlRequest) -> Result<(), FundError> {
 
         if fund.open {
             return Err(FundErrorCode::FundOpen.into());
+        }
+        if amount > fund.balance {
+            return Err(FundErrorCode::InsufficientBalance)?;
         }
     }
 
