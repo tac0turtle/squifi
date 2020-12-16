@@ -8,7 +8,7 @@ use fund::{
 };
 use serum_common::pack::Pack;
 use solana_program::{
-    account_info::AccountInfo, entrypoint, entrypoint::ProgramResult, info, pubkey::Pubkey,
+    account_info::AccountInfo, entrypoint, entrypoint::ProgramResult, msg, pubkey::Pubkey,
 };
 
 pub(crate) mod access_control;
@@ -26,7 +26,7 @@ fn process_instruction(
     accounts: &[AccountInfo],
     instruction_data: &[u8],
 ) -> ProgramResult {
-    info!("process-instruction");
+    msg!("process-instruction");
 
     let instruction: FundInstruction = FundInstruction::unpack(instruction_data)
         .map_err(|_| FundError::ErrorCode(FundErrorCode::WrongSerialization))?;
@@ -61,7 +61,7 @@ fn process_instruction(
 
     result?;
 
-    info!("process-instruction success");
+    msg!("process-instruction success");
 
     Ok(())
 }

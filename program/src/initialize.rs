@@ -12,7 +12,7 @@ use serum_common::pack::Pack;
 
 use solana_program::{
     account_info::{next_account_info, AccountInfo},
-    info,
+    msg,
     program_option::COption,
     pubkey::Pubkey,
 };
@@ -26,7 +26,7 @@ pub fn handler(
     max_balance: u64,
     fund_type: FundType,
 ) -> Result<(), FundError> {
-    info!("Initialize Fund");
+    msg!("Initialize Fund");
 
     let acc_infos = &mut accounts.iter();
     let fund_acc_info = next_account_info(acc_infos)?;
@@ -50,7 +50,7 @@ pub fn handler(
     })?;
 
     // 2. Creation
-    info!("create fund");
+    msg!("create fund");
     Fund::unpack_mut(
         &mut fund_acc_info.try_borrow_mut_data()?,
         &mut |fund_acc: &mut Fund| {
@@ -75,7 +75,7 @@ pub fn handler(
 }
 
 fn access_control(req: AccessControlRequest) -> Result<(), FundError> {
-    info!("access-control: initialize");
+    msg!("access-control: initialize");
 
     let AccessControlRequest {
         program_id,
@@ -131,13 +131,13 @@ fn access_control(req: AccessControlRequest) -> Result<(), FundError> {
     // Mint (initialized but not yet on Safe).
     let _ = access_control::mint(mint_acc_info)?;
 
-    info!("access-control: success");
+    msg!("access-control: success");
 
     Ok(())
 }
 
 fn state_transition(req: StateTransitionRequest) -> Result<(), FundError> {
-    info!("state-transition: initialize");
+    msg!("state-transition: initialize");
 
     let StateTransitionRequest {
         fund_acc,
@@ -175,7 +175,7 @@ fn state_transition(req: StateTransitionRequest) -> Result<(), FundError> {
         fund_acc.whitelist = *whitelist_acc_info.unwrap().key;
     }
 
-    info!("state-transition: success");
+    msg!("state-transition: success");
 
     Ok(())
 }

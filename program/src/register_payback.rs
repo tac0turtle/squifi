@@ -6,7 +6,7 @@ use fund::{
 use serum_common::pack::Pack;
 use solana_program::{
     account_info::{next_account_info, AccountInfo},
-    info,
+    msg,
     pubkey::Pubkey,
 };
 use std::convert::Into;
@@ -16,7 +16,7 @@ pub fn handler(
     accounts: &[AccountInfo],
     amount: u64,
 ) -> Result<(), FundError> {
-    info!("Handler: payback_init");
+    msg!("Handler: payback_init");
     let acc_infos = &mut accounts.iter();
 
     let fund_acc_info = next_account_info(acc_infos)?;
@@ -59,12 +59,12 @@ fn access_control(req: AccessControlRequest) -> Result<(), FundError> {
 fn state_transistion(req: StateTransistionRequest) -> Result<(), FundError> {
     let StateTransistionRequest { fund_acc, amount } = req;
 
-    info!("State-Transistion: Initialize Register Payback");
+    msg!("State-Transistion: Initialize Register Payback");
 
     let per_share = fund_acc.shares.checked_div(amount).unwrap();
     fund_acc.add_new_payback(amount, per_share);
 
-    info!("State-Transistion: Initialize Register Payback Success");
+    msg!("State-Transistion: Initialize Register Payback Success");
     Ok(())
 }
 
