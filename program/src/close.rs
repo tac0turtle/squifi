@@ -3,12 +3,12 @@ use fund::{accounts::fund::Fund, error::FundError};
 use serum_common::pack::Pack;
 use solana_program::{
     account_info::{next_account_info, AccountInfo},
-    info,
+    msg,
     pubkey::Pubkey,
 };
 
 pub fn handler(program_id: &Pubkey, accounts: &[AccountInfo]) -> Result<(), FundError> {
-    info!("handler close initiate");
+    msg!("handler close initiate");
     let acc_info = &mut accounts.iter();
 
     let fund_acc_info = next_account_info(acc_info)?;
@@ -39,7 +39,7 @@ fn access_control(req: AccessControlRequest) -> Result<(), FundError> {
 
     let _ = access_control::check_owner(program_id, fund_acc_info, fund_owner_acc_info)?;
 
-    info!("access control close success");
+    msg!("access control close success");
 
     Ok(())
 }
@@ -49,7 +49,7 @@ fn state_transition(req: StateTransistionRequest) -> Result<(), FundError> {
 
     fund_acc.close_fund();
 
-    info!("state transition close success");
+    msg!("state transition close success");
 
     Ok(())
 }

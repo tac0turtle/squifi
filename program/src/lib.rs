@@ -1,21 +1,21 @@
 //! Program entrypoint
 
+#![cfg_attr(feature = "strict", deny(warnings))]
+
 use fund::{
     error::{FundError, FundErrorCode},
     instruction::FundInstruction,
 };
 use serum_common::pack::Pack;
 use solana_program::{
-    account_info::AccountInfo, entrypoint, entrypoint::ProgramResult, info, pubkey::Pubkey,
+    account_info::AccountInfo, entrypoint, entrypoint::ProgramResult, msg, pubkey::Pubkey,
 };
 
 pub(crate) mod access_control;
 mod close;
 mod deposit;
 mod initialize;
-mod payback_deposit;
-mod payback_init;
-mod payback_withdraw;
+mod register_payback;
 mod whitelist_add;
 mod whitelist_delete;
 mod withdraw;
@@ -26,7 +26,7 @@ fn process_instruction(
     accounts: &[AccountInfo],
     instruction_data: &[u8],
 ) -> ProgramResult {
-    info!("process-instruction");
+    msg!("process-instruction");
 
     let instruction: FundInstruction = FundInstruction::unpack(instruction_data)
         .map_err(|_| FundError::ErrorCode(FundErrorCode::WrongSerialization))?;
@@ -56,20 +56,14 @@ fn process_instruction(
         FundInstruction::WhitelistDelete { entry } => {
             whitelist_delete::handler(program_id, accounts, entry)
         }
-        FundInstruction::InitializePayback { amount } => {
-            payback_init::handler(program_id, accounts, amount)
-        }
-        FundInstruction::PaybackWithdraw { amount } => {
-            payback_withdraw::handler(program_id, accounts, amount)
-        }
-        FundInstruction::PaybackDeposit { amount } => {
-            payback_deposit::handler(program_id, accounts, amount)
+        FundInstruction::RegisterPayback { amount } => {
+            register_payback::handler(program_id, accounts, amount)
         }
     };
 
     result?;
 
-    info!("process-instruction success");
+    msg!("process-instruction success");
 
     Ok(())
 }

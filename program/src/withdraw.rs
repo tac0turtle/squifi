@@ -1,12 +1,12 @@
 use crate::access_control;
 use fund::{
-    accounts::{fund::Fund, vault::TokenVault},
+    accounts::{vault::TokenVault, Fund},
     error::{FundError, FundErrorCode},
 };
 use serum_common::pack::Pack;
 use solana_program::{
     account_info::{next_account_info, AccountInfo},
-    info, program,
+    msg, program,
     pubkey::Pubkey,
 };
 use spl_token::instruction;
@@ -17,7 +17,7 @@ pub fn handler(
     accounts: &[AccountInfo],
     amount: u64,
 ) -> Result<(), FundError> {
-    info!("handler: withdraw");
+    msg!("handler: withdraw");
 
     let acc_infos = &mut accounts.iter();
     let vault_acc_info = next_account_info(acc_infos)?;
@@ -57,7 +57,7 @@ pub fn handler(
 fn access_control(req: AccessControlRequest) -> Result<(), FundError> {
     let AccessControlRequest {
         program_id,
-        amount: _,
+        amount,
         fund_acc_info,
         withdraw_acc_info,
         vault_acc_info,
@@ -80,11 +80,14 @@ fn access_control(req: AccessControlRequest) -> Result<(), FundError> {
         if fund.open {
             return Err(FundErrorCode::FundOpen.into());
         }
+        if amount > fund.balance {
+            return Err(FundErrorCode::InsufficientBalance)?;
+        }
     }
 
     let _ = access_control::withdraw(program_id, fund_acc_info, withdraw_acc_info);
 
-    info!("access control withdraw success");
+    msg!("access control withdraw success");
 
     Ok(())
 }
@@ -103,7 +106,7 @@ fn state_transistion(req: StateTransistionRequest) -> Result<(), FundError> {
     {
         fund_acc.deduct(amount);
         // transfer from program account to owner of fund
-        info!("invoking token transfer");
+        msg!("invoking token transfer");
         let withdraw_instruction = instruction::transfer(
             &spl_token::ID,
             vault_acc_info.key,
@@ -127,7 +130,7 @@ fn state_transistion(req: StateTransistionRequest) -> Result<(), FundError> {
         )?;
     }
 
-    info!("state transition withdraw success");
+    msg!("state transition withdraw success");
 
     Ok(())
 }

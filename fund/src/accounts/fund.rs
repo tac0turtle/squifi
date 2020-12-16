@@ -1,8 +1,8 @@
-use serde::{Deserialize, Serialize};
+use borsh::{BorshDeserialize, BorshSchema, BorshSerialize};
 use serum_common::pack::*;
-use solana_client_gen::solana_sdk::pubkey::Pubkey;
+use solana_client_gen::prelude::*;
 
-#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Clone, Copy, BorshSerialize, BorshDeserialize, BorshSchema, PartialEq)]
 pub enum FundType {
     /// similar to a gofundme
     FundMe,
@@ -16,8 +16,14 @@ impl Default for FundType {
     }
 }
 
+impl Default for FundType {
+    fn default() -> Self {
+        FundType::FundMe
+    }
+}
+
 /// The Owner of the fund has the right to withdraw all or some of the funds
-#[derive(Debug, Default, Serialize, Deserialize)]
+#[derive(Default, Debug, BorshSerialize, BorshDeserialize, BorshSchema)]
 pub struct Fund {
     /// check to see if a fund is ininitialized
     pub initialized: bool,
@@ -50,10 +56,11 @@ pub struct Fund {
     pub nft_mint: Pubkey,
     /// whitelist represents a list of pubkeys that can deposit into a fund
     pub whitelist: Pubkey,
-    /// payback token vault
-    pub payback_vault: Pubkey,
-    /// payback balance
-    pub payback_bal: u64,
+
+    /// Payback info
+    pub paybacks: Vec<Payback>,
+    /// round refers to the round of payback
+    pub round: u32,
 }
 
 impl Fund {
@@ -77,13 +84,32 @@ impl Fund {
             self.open = false;
         }
     }
-    pub fn add_payback_bal(&mut self, amount: u64) {
-        self.payback_bal += amount;
-    }
 
-    pub fn get_share_dist() -> u64 {
-        1
+    pub fn add_new_payback(&mut self, total: u64, per_share: u64) {
+        let pb = Payback::new(total, per_share);
+        self.paybacks.push(pb);
+        self.round += 1;
     }
 }
 
 serum_common::packable!(Fund);
+
+#[derive(Default, Debug, BorshSerialize, BorshDeserialize, BorshSchema)]
+pub struct Payback {
+    /// total of the paybck
+    pub total: u64,
+    /// per_share
+    pub per_share: u64,
+}
+
+impl Payback {
+    pub fn new(total: u64, per_share: u64) -> Self {
+        Payback { total, per_share }
+    }
+    pub fn add_total(&mut self, amount: u64) {
+        self.total += amount;
+    }
+    pub fn add_payback_per_share(&mut self, amount: u64) {
+        self.per_share += amount;
+    }
+}

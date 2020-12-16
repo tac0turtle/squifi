@@ -19,7 +19,6 @@ default = []
 arrayref = "0.3.6"
 bytemuck = "1.4.1"
 num_enum = "0.5.0"
-serde = {version = "1.0", features = ["derive"]}
 serum-common = {git = "https://github.com/project-serum/serum-dex"}
 solana-client-gen = {git = "https://github.com/project-serum/serum-dex"}
 spl-token = {version = "2.0.8", default-features = false}
@@ -27,3 +26,5 @@ thiserror = "1.0.20"
 
 # Client only.
 lazy_static = { version = "1.4.0", optional = true }
+# Forks.
+borsh = { git = "https://github.com/project-serum/borsh", branch = "serum" }
