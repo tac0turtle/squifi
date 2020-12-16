@@ -71,31 +71,9 @@ pub mod instruction {
         WhitelistDelete { entry: Pubkey },
         /// InitilaizePayback creates a program address to pay back token holders
         ///
-        /// 0. `[writable]` Payback Tokenvault (new).
-        /// 1. `[writable]` Fund
-        /// 2. `[writable]` Depositor token account.
-        /// 3. `[signer]`   Depositor auhtority.
-        /// 5. `[]`         Token Program Account
-        InitializePayback { amount: u64 },
-        /// PayBack Withdrwal allows the holder of the Fund NFT to withdraw rewards.
-        ///
-        /// 0. `[]`         SPL Token program
-        /// 1. `[]`         Fund SPL NFT program
-        /// 2. `[]`         Payback Vault Authority
-        /// 3. `[writable]` Payback Vault
-        /// 4. `[writable]` Fund
-        /// 5. `[]`         Withdraw Account
-        /// 6. `[]`         NFT Token Account
-        PaybackWithdraw { amount: u64 },
-        /// PayBack Deposit allows the fund owner to deposit more into the payback vault.
-        ///
-        /// 0. `[writable]` Depositor token account.
+        /// 0. `[writable]` Fund
         /// 1. `[signer]`   Depositor auhtority.
-        /// 2. `[]`         SPL Token program
-        /// 5. `[writable]` Payback Vault
-        /// 5. `[]`         Payback Vault Authority
-        /// 6. `[writable]` Fund
-        PaybackDeposit { amount: u64 },
+        RegisterPayback { amount: u64 },
     }
 }
 

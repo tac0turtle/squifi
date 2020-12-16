@@ -1,11 +1,11 @@
 use crate::access_control;
 use fund::{
-    accounts::whitelist::Whitelist,
+    accounts::Whitelist,
     error::{FundError, FundErrorCode},
 };
 use solana_program::{
     account_info::{next_account_info, AccountInfo},
-    info,
+    msg,
     pubkey::Pubkey,
 };
 
@@ -14,7 +14,7 @@ pub fn handler(
     accounts: &[AccountInfo],
     entry: Pubkey,
 ) -> Result<(), FundError> {
-    info!("handler: whitelist_add");
+    msg!("handler: whitelist_add");
 
     let acc_infos = &mut accounts.iter();
 
@@ -35,7 +35,7 @@ pub fn handler(
 }
 
 fn access_control(req: AccessControlRequest) -> Result<(), FundError> {
-    info!("access-control: whitelist_add");
+    msg!("access-control: whitelist_add");
 
     let AccessControlRequest {
         program_id,

@@ -51,10 +51,11 @@ pub struct Fund {
     pub nft_mint: Pubkey,
     /// whitelist represents a list of pubkeys that can deposit into a fund
     pub whitelist: Pubkey,
-    /// payback token vault
-    pub payback_vault: Pubkey,
-    /// payback balance
-    pub payback_bal: u64,
+
+    /// Payback info
+    pub paybacks: Vec<Payback>,
+    /// round refers to the round of payback
+    pub round: u32,
 }
 
 impl Fund {
@@ -78,13 +79,32 @@ impl Fund {
             self.open = false;
         }
     }
-    pub fn add_payback_bal(&mut self, amount: u64) {
-        self.payback_bal += amount;
-    }
 
-    pub fn get_share_dist() -> u64 {
-        1
+    pub fn add_new_payback(&mut self, total: u64, per_share: u64) {
+        let pb = Payback::new(total, per_share);
+        self.paybacks.push(pb);
+        self.round += 1;
     }
 }
 
 serum_common::packable!(Fund);
+
+#[derive(Default, Debug, BorshSerialize, BorshDeserialize, BorshSchema)]
+pub struct Payback {
+    /// total of the paybck
+    pub total: u64,
+    /// per_share
+    pub per_share: u64,
+}
+
+impl Payback {
+    pub fn new(total: u64, per_share: u64) -> Self {
+        Payback { total, per_share }
+    }
+    pub fn add_total(&mut self, amount: u64) {
+        self.total += amount;
+    }
+    pub fn add_payback_per_share(&mut self, amount: u64) {
+        self.per_share += amount;
+    }
+}

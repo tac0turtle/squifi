@@ -9,7 +9,7 @@ use fund::{
 use serum_common::pack::Pack;
 use solana_program::{
     account_info::{next_account_info, AccountInfo},
-    info, program,
+    msg, program,
     pubkey::Pubkey,
 };
 use spl_token::instruction;
@@ -20,7 +20,7 @@ pub fn handler(
     accounts: &[AccountInfo],
     amount: u64,
 ) -> Result<(), FundError> {
-    info!("Handler: deposit");
+    msg!("Handler: deposit");
 
     let acc_infos = &mut accounts.iter();
 
@@ -126,7 +126,7 @@ fn access_control(req: AccessControlRequest) -> Result<(), FundError> {
         }
     }
 
-    info!("access control deposit success");
+    msg!("access control deposit success");
 
     Ok(())
 }
@@ -149,7 +149,7 @@ fn state_transistion(req: StateTransistionRequest) -> Result<(), FundError> {
         if fund_acc.fund_type.eq(&FundType::Raise { private: false })
             || fund_acc.fund_type.eq(&FundType::Raise { private: true })
         {
-            info!("invoke SPL token mint");
+            msg!("invoke SPL token mint");
             let mint_to_instr = instruction::mint_to(
                 &spl_token::ID,
                 nft_token_acc_info.unwrap().key,
@@ -170,7 +170,7 @@ fn state_transistion(req: StateTransistionRequest) -> Result<(), FundError> {
     // Now transfer SPL funds from the depositor, to the
     // program-controlled account.
     {
-        info!("invoke SPL token transfer");
+        msg!("invoke SPL token transfer");
         let deposit_instruction = instruction::transfer(
             &spl_token::ID,
             depositor_acc_info.key,
@@ -190,7 +190,7 @@ fn state_transistion(req: StateTransistionRequest) -> Result<(), FundError> {
             &[],
         )?;
     }
-    info!("state transition deposit success");
+    msg!("state transition deposit success");
 
     Ok(())
 }
