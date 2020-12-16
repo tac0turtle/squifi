@@ -16,7 +16,13 @@ pub fn create_all_accounts_and_initialize_fundme(
     max_balance: u64,
     fund_type: FundType,
 ) -> Result<InitializeResponse, InnerClientError> {
+    // create the fund
+    // create the fund vault
+    // create program account
+
+    // fund account to be created
     let fund_acc = Keypair::generate(&mut OsRng);
+
     let (fund_vault_authority, nonce) =
         Pubkey::find_program_address(&[fund_acc.pubkey().as_ref()], client.program());
 
@@ -28,6 +34,7 @@ pub fn create_all_accounts_and_initialize_fundme(
     )
     .map_err(|e| InnerClientError::RawError(e.to_string()))?;
 
+    // Build the final transaction.
     let wl_kp = Keypair::generate(&mut OsRng);
     let instructions = {
         let create_fund_acc_instr = {
@@ -60,13 +67,10 @@ pub fn create_all_accounts_and_initialize_fundme(
             nonce,
         );
 
-        vec![
-            create_fund_acc_instr,
-            // create_whitelist_acc_instr,
-            initialize_instr,
-        ]
+        vec![create_fund_acc_instr, initialize_instr]
     };
 
+    // Create the Transaction.
     let tx = {
         let (recent_hash, _fee_calc) = client
             .rpc()
@@ -81,6 +85,7 @@ pub fn create_all_accounts_and_initialize_fundme(
         )
     };
 
+    // Execute the transaction.
     client
         .rpc()
         .send_and_confirm_transaction_with_spinner_and_config(

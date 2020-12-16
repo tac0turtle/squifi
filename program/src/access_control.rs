@@ -62,7 +62,7 @@ pub fn check_owner(
 
     let fund = fund(acc_info, program_id)?;
 
-    if !fund.owner.eq(owner_acc_info.key) {
+    if !fund.authority.eq(owner_acc_info.key) {
         return Err(FundErrorCode::InvalidAccountOwner.into());
     }
 
@@ -189,7 +189,7 @@ pub fn withdraw(
     if !fund.initialized {
         return Err(FundErrorCode::NotInitialized.into());
     }
-    if fund.owner != *withdraw_acc_beneficiary_info.key {
+    if fund.authority != *withdraw_acc_beneficiary_info.key {
         return Err(FundErrorCode::Unauthorized.into());
     }
 

@@ -21,7 +21,6 @@ use std::convert::Into;
 pub fn handler(
     program_id: &Pubkey,
     accounts: &[AccountInfo],
-    owner: Pubkey,
     authority: Pubkey,
     max_balance: u64,
     fund_type: FundType,
@@ -58,7 +57,6 @@ pub fn handler(
         &mut |fund_acc: &mut Fund| {
             state_transition(StateTransitionRequest {
                 fund_acc,
-                owner,
                 authority,
                 mint: mint_acc_info.key,
                 token_program: token_program_acc_info.key,
@@ -144,7 +142,6 @@ fn state_transition(req: StateTransitionRequest) -> Result<(), FundError> {
 
     let StateTransitionRequest {
         fund_acc,
-        owner,
         authority,
         vault,
         mint,
@@ -159,7 +156,6 @@ fn state_transition(req: StateTransitionRequest) -> Result<(), FundError> {
 
     fund_acc.initialized = true;
     fund_acc.open = true;
-    fund_acc.owner = owner;
     fund_acc.authority = authority;
     fund_acc.vault = vault;
     fund_acc.mint = *mint;
@@ -196,7 +192,6 @@ struct AccessControlRequest<'a, 'b> {
 
 struct StateTransitionRequest<'a, 'b> {
     fund_acc: &'a mut Fund,
-    owner: Pubkey,
     authority: Pubkey,
     fund_type: FundType,
     token_program: &'a Pubkey,

@@ -33,7 +33,6 @@ fn process_instruction(
 
     let result = match instruction {
         FundInstruction::Initialize {
-            owner,
             authority,
             max_balance,
             fund_type,
@@ -41,7 +40,6 @@ fn process_instruction(
         } => initialize::handler(
             program_id,
             accounts,
-            owner,
             authority,
             max_balance,
             fund_type,

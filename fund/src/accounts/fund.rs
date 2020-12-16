@@ -16,12 +16,6 @@ impl Default for FundType {
     }
 }
 
-impl Default for FundType {
-    fn default() -> Self {
-        FundType::FundMe
-    }
-}
-
 /// The Owner of the fund has the right to withdraw all or some of the funds
 #[derive(Default, Debug, BorshSerialize, BorshDeserialize, BorshSchema)]
 pub struct Fund {
