@@ -11,6 +11,10 @@ use solana_program::{
     account_info::AccountInfo, entrypoint, entrypoint::ProgramResult, msg, pubkey::Pubkey,
 };
 
+pub use solana_program;
+
+solana_program::declare_id!("SPQQL11111111111111111111111111111111111111");
+
 pub(crate) mod access_control;
 mod close;
 mod deposit;

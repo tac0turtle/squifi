@@ -9,7 +9,7 @@ version = "0.1.0"
 
 [lib]
 crate-type = ["cdylib", "lib"]
-name = "fund_program"
+name = "spool_fund"
 
 [features]
 program = ["spl-token/program", "spl-token/no-entrypoint", "fund/program"]

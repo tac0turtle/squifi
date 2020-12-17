@@ -1,0 +1,19 @@
+[package]
+name = "squifi-cli"
+version = "0.1.0"
+authors = ["Callum Michael Waters <cmwaters19@gmail.com>", "Marko Baricevic <marbar3778@yahoo.com>"]
+description = "Squifi - Squad Finance Command Line Tool"
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+clap = "2.33.3"
+solana-clap-utils = "1.4.5"
+fund = {path = "../"}
+client = {path = "../client/"}
+
+[[bin]]
+name = "squifi"
+path = "src/main.rs"
+
