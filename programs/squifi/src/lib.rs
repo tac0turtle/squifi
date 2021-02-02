@@ -11,26 +11,21 @@ mod squifi {
     pub fn initialize(ctx: Context<Initialize>) -> ProgramResult {
         Ok(())
     }
-    #[access_control(CreateFund::accounts(&ctx, nonce))]
+    #[access_control(Initialize::accounts(&ctx, nonce))]
     pub fn create_fund(
-        ctx: Context<CreateFund>,
+        ctx: Context<Initialize>,
         authority: Pubkey,
         max_balance: u64,
         nonce: u8,
     ) -> Result<()> {
 
-        let vesting = &mut ctx.accounts.fund;
-        vesting.beneficiary = beneficiary;
-        vesting.mint = ctx.accounts.vault.mint;
-        vesting.vault = *ctx.accounts.vault.to_account_info().key;
-        vesting.period_count = period_count;
-        vesting.start_balance = deposit_amount;
-        vesting.end_ts = end_ts;
-        vesting.start_ts = ctx.accounts.clock.unix_timestamp;
-        vesting.outstanding = deposit_amount;
-        vesting.whitelist_owned = 0;
-        vesting.grantor = *ctx.accounts.depositor_authority.key;
-        vesting.nonce = nonce;
+        let fund = &mut ctx.accounts.fund;
+        fund.beneficiary = beneficiary;
+        fund.mint = ctx.accounts.fund.mint;
+        fund.vault = *ctx.accounts.fund.to_account_info().key;
+        fund.period_count = period_count;
+        fund.max_balance = max_balance;
+        fund.nonce = nonce;
 
         token::transfer(ctx.accounts.into(), deposit_amount)?;
 
